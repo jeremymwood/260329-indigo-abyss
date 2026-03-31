@@ -38,6 +38,7 @@
     <section class="cart-summary">
       <p>Total</p>
       <strong><%= @currency %> <%= format("%.2f", @total_amount) %></strong>
+      <%= button_to "Checkout", cart_checkout_path, method: :post, class: "pagination-link button-link" %>
     </section>
   <% end %>
 </main>

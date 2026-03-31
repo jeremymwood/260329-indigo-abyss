@@ -19,6 +19,10 @@
   </head>
 
   <body>
+    <% flash.each do |type, message| %>
+      <% next if message.blank? %>
+      <p class="flash <%= type %>"><%= message %></p>
+    <% end %>
     <%= yield %>
   </body>
 </html>

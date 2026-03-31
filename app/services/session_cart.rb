@@ -1,5 +1,6 @@
 class SessionCart
   CartLine = Struct.new(:identifier, :product, :quantity, :subtotal_amount, :currency_code, keyword_init: true)
+  CheckoutLine = Struct.new(:identifier, :quantity, :variant_id, keyword_init: true)
 
   def initialize(session:)
     @session = session
@@ -52,6 +53,17 @@ class SessionCart
         currency_code: currency || "USD"
       )
     end.compact
+  end
+
+  def checkout_lines(catalog:)
+    stored_items.map do |id, quantity|
+      product = catalog.find(id)
+      CheckoutLine.new(
+        identifier: id,
+        quantity: quantity,
+        variant_id: product&.variant_id
+      )
+    end
   end
 
   def empty?
