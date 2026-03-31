@@ -17,7 +17,7 @@ module Shopify
 
     test "build rejects invalid lines" do
       builder = CheckoutUrlBuilder.new(store_domain: "indigo-abyss.myshopify.com")
-      lines = [SessionCart::CheckoutLine.new(identifier: "bad", quantity: 1, variant_id: nil)]
+      lines = [ SessionCart::CheckoutLine.new(identifier: "bad", quantity: 1, variant_id: nil) ]
 
       result = builder.build(lines: lines)
 
