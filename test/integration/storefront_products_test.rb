@@ -22,6 +22,14 @@ class StorefrontProductsTest < ActionDispatch::IntegrationTest
     assert_select "p", /USD 168.00/
   end
 
+  test "renders home page with featured products" do
+    get "/"
+
+    assert_response :success
+    assert_select "h1", "Indigo Abyss"
+    assert_select ".product-grid .product-card", minimum: 1
+  end
+
   test "returns 404 when product does not exist" do
     get "/products/not-a-real-product"
 
