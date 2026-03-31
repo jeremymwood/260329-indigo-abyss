@@ -8,6 +8,9 @@
     <p class="sublead">
       <%= @shopify_connected ? "Live product data is loading from your Shopify storefront." : "Running in showcase mode. Set Shopify env vars to pull live products." %>
     </p>
+    <p class="hero-actions">
+      <%= link_to "Browse Full Collection", shop_path, class: "pagination-link" %>
+    </p>
   </section>
 
   <section class="collection-header">
