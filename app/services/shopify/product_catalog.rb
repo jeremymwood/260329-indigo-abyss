@@ -1,4 +1,5 @@
 require "cgi"
+require "base64"
 
 module Shopify
   class ProductCatalog
@@ -20,6 +21,66 @@ module Shopify
                 currencyCode
               }
             }
+          }
+        }
+      }
+    GRAPHQL
+
+    PRODUCTS_PAGE_FORWARD_QUERY = <<~GRAPHQL
+      query ProductsPageForward($first: Int!, $after: String) {
+        products(first: $first, after: $after, sortKey: BEST_SELLING) {
+          edges {
+            cursor
+            node {
+              id
+              handle
+              title
+              description
+              featuredImage {
+                url
+                altText
+              }
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+        }
+      }
+    GRAPHQL
+
+    PRODUCTS_PAGE_BACKWARD_QUERY = <<~GRAPHQL
+      query ProductsPageBackward($last: Int!, $before: String) {
+        products(last: $last, before: $before, sortKey: BEST_SELLING) {
+          edges {
+            cursor
+            node {
+              id
+              handle
+              title
+              description
+              featuredImage {
+                url
+                altText
+              }
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
           }
         }
       }
@@ -74,13 +135,19 @@ module Shopify
     end
 
     def featured(limit: 6)
-      return fallback_products if !@client.configured?
+      return fallback_products.first(limit) if !@client.configured?
 
       data = @client.query(query: FEATURED_PRODUCTS_QUERY, variables: { first: limit })
       nodes = data&.dig("products", "nodes")
-      return fallback_products if nodes.blank?
+      return fallback_products.first(limit) if nodes.blank?
 
       nodes.map { |node| to_product_card(node, truncate_description: true) }
+    end
+
+    def page(first:, after: nil, before: nil)
+      return fallback_page(first: first, after: after, before: before) if !@client.configured?
+
+      live_page(first: first, after: after, before: before) || fallback_page(first: first, after: after, before: before)
     end
 
     def find(identifier)
@@ -95,6 +162,65 @@ module Shopify
     end
 
     private
+
+    def live_page(first:, after:, before:)
+      if before.present?
+        data = @client.query(query: PRODUCTS_PAGE_BACKWARD_QUERY, variables: { last: first, before: before })
+      else
+        data = @client.query(query: PRODUCTS_PAGE_FORWARD_QUERY, variables: { first: first, after: after })
+      end
+
+      products_data = data&.dig("products")
+      return nil if products_data.blank?
+
+      edges = products_data["edges"] || []
+      product_cards = edges.map { |edge| to_product_card(edge["node"], truncate_description: true) }
+      page_info = products_data["pageInfo"] || {}
+
+      ProductPage.new(
+        products: product_cards,
+        next_cursor: page_info["hasNextPage"] ? edges.last&.dig("cursor") : nil,
+        prev_cursor: page_info["hasPreviousPage"] ? edges.first&.dig("cursor") : nil
+      )
+    end
+
+    def fallback_page(first:, after:, before:)
+      rows = fallback_rows
+      return ProductPage.new(products: [], next_cursor: nil, prev_cursor: nil) if rows.blank?
+
+      per_page = [[first.to_i, 1].max, 24].min
+
+      if before.present?
+        end_index = decode_fallback_cursor(before) || rows.length
+        end_index = [[end_index, 0].max, rows.length].min
+        start_index = [end_index - per_page, 0].max
+      else
+        start_index = after.present? ? (decode_fallback_cursor(after).to_i + 1) : 0
+        start_index = [[start_index, 0].max, rows.length].min
+        end_index = [start_index + per_page, rows.length].min
+      end
+
+      window = rows[start_index...end_index] || []
+      cards = window.map do |row|
+        ProductCard.new(
+          id: row[:id],
+          handle: row[:handle],
+          title: row[:title],
+          description: truncate(row[:description]),
+          image_url: row[:image_url],
+          price: row[:price]
+        )
+      end
+
+      has_previous = start_index.positive?
+      has_next = end_index < rows.length
+
+      ProductPage.new(
+        products: cards,
+        next_cursor: has_next ? encode_fallback_cursor(end_index - 1) : nil,
+        prev_cursor: has_previous ? encode_fallback_cursor(start_index) : nil
+      )
+    end
 
     def live_product(identifier)
       decoded_identifier = CGI.unescape(identifier.to_s)
@@ -138,6 +264,19 @@ module Shopify
           price: row[:price]
         )
       end
+    end
+
+    def encode_fallback_cursor(index)
+      Base64.urlsafe_encode64("idx:#{index}")
+    end
+
+    def decode_fallback_cursor(cursor)
+      decoded = Base64.urlsafe_decode64(cursor.to_s)
+      return nil if !decoded.start_with?("idx:")
+
+      Integer(decoded.delete_prefix("idx:"), exception: false)
+    rescue ArgumentError
+      nil
     end
 
     def fallback_rows

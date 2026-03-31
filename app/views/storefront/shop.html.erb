@@ -1,0 +1,47 @@
+<% content_for :title, "Shop | Indigo Abyss" %>
+
+<main class="site-shell">
+  <section class="hero">
+    <p class="eyebrow">Indigo Abyss Collection</p>
+    <h1>Shop Raw Denim</h1>
+    <p class="lead">Browse the full Indigo Abyss catalog with cursor-based pagination.</p>
+    <p class="sublead"><%= @shopify_connected ? "Live Shopify collection" : "Showcase mode collection" %></p>
+  </section>
+
+  <% if @catalog_page.empty? %>
+    <section class="empty-state" aria-live="polite">
+      <h2>No products available yet</h2>
+      <p>We do not have any products to display right now. Please check back soon.</p>
+      <%= link_to "Back to Home", root_path, class: "pagination-link" %>
+    </section>
+  <% else %>
+    <section class="product-grid" aria-label="Shop products">
+      <% @catalog_page.products.each do |product| %>
+        <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
+          <article class="product-card">
+            <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+            <div class="product-body">
+              <h3><%= product.title %></h3>
+              <p><%= product.description %></p>
+              <span class="price"><%= product.price %></span>
+            </div>
+          </article>
+        <% end %>
+      <% end %>
+    </section>
+
+    <nav class="pagination-nav" aria-label="Collection pagination">
+      <% if @catalog_page.prev_cursor.present? %>
+        <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+      <% else %>
+        <span class="pagination-link disabled" aria-disabled="true">Previous</span>
+      <% end %>
+
+      <% if @catalog_page.next_cursor.present? %>
+        <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+      <% else %>
+        <span class="pagination-link disabled" aria-disabled="true">Next</span>
+      <% end %>
+    </nav>
+  <% end %>
+</main>
