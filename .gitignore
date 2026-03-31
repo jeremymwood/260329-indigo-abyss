@@ -15,9 +15,20 @@
 # Ignore all environment files.
 /.env*
 !/.env.example
+/.envrc
+/server/.env*
 
 # Never commit Rails secret key material.
 /config/master.key
+/config/credentials/*.key
+
+# Never commit private key/certificate material.
+*.pem
+*.p12
+*.pfx
+*.key
+*.crt
+*.cer
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -38,3 +49,6 @@
 !/tmp/storage/.keep
 
 /public/assets
+
+# Secret scanning reports
+/gitleaks-report.json

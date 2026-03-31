@@ -20,6 +20,11 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Run secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Prepare database
         run: bin/rails db:prepare
 
