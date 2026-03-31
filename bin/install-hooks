@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+success = system("git", "config", "core.hooksPath", ".githooks")
+abort("Failed to set core.hooksPath") unless success
+
+puts "Git hooks installed: .githooks"

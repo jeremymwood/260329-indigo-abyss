@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "rbconfig"
+
+ENV["RUBOCOP_CACHE_ROOT"] ||= "tmp/rubocop_cache"
+
+checks = [
+  [RbConfig.ruby, "bin/rubocop"],
+  [RbConfig.ruby, "bin/rails", "test"]
+]
+
+checks.each do |cmd|
+  puts "==> #{cmd.join(' ')}"
+  next if system(*cmd)
+
+  warn "Check failed: #{cmd.join(' ')}"
+  exit 1
+end
+
+puts "All pre-push checks passed."
