@@ -16,14 +16,16 @@
 
   <section class="product-grid" aria-label="Featured products">
     <% @products.each do |product| %>
-      <article class="product-card">
-        <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
-        <div class="product-body">
-          <h3><%= product.title %></h3>
-          <p><%= product.description %></p>
-          <span class="price"><%= product.price %></span>
-        </div>
-      </article>
+      <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
+        <article class="product-card">
+          <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+          <div class="product-body">
+            <h3><%= product.title %></h3>
+            <p><%= product.description %></p>
+            <span class="price"><%= product.price %></span>
+          </div>
+        </article>
+      <% end %>
     <% end %>
   </section>
 </main>

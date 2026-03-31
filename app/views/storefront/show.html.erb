@@ -1,0 +1,24 @@
+<% content_for :title, "#{@product.title} | Indigo Abyss" %>
+
+<main class="site-shell">
+  <nav class="product-breadcrumb">
+    <%= link_to "Back to Collection", root_path %>
+  </nav>
+
+  <article class="product-detail">
+    <div class="product-detail-image-wrap">
+      <img src="<%= @product.image_url %>" alt="<%= @product.title %>" class="product-detail-image">
+    </div>
+
+    <div class="product-detail-content">
+      <p class="eyebrow">Indigo Abyss Denim</p>
+      <h1><%= @product.title %></h1>
+      <p class="product-detail-copy"><%= @product.description %></p>
+      <p class="product-detail-price"><%= @product.price %></p>
+
+      <p class="product-detail-meta">
+        <%= @shopify_connected ? "Live Shopify product details" : "Showcase mode product details" %>
+      </p>
+    </div>
+  </article>
+</main>
