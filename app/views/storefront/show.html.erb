@@ -3,6 +3,8 @@
 <main class="site-shell">
   <nav class="product-breadcrumb">
     <%= link_to "Back to Collection", root_path %>
+    <span class="breadcrumb-spacer">|</span>
+    <%= link_to "Cart", cart_path %>
   </nav>
 
   <article class="product-detail">
@@ -15,6 +17,11 @@
       <h1><%= @product.title %></h1>
       <p class="product-detail-copy"><%= @product.description %></p>
       <p class="product-detail-price"><%= @product.price %></p>
+
+      <div class="cart-actions">
+        <%= button_to "Add to Cart", cart_items_path(product_id: (@product.handle || @product.id), quantity: 1), method: :post, class: "pagination-link button-link" %>
+        <%= link_to "View Cart", cart_path, class: "pagination-link" %>
+      </div>
 
       <p class="product-detail-meta">
         <%= @shopify_connected ? "Live Shopify product details" : "Showcase mode product details" %>
