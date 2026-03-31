@@ -3,6 +3,19 @@ require "base64"
 require "nokogiri"
 
 class StorefrontShopTest < ActionDispatch::IntegrationTest
+  class FakeClient
+    attr_reader :last_error
+
+    def configured?
+      true
+    end
+
+    def query(query:, variables: {})
+      @last_error = { type: :timeout, message: "timeout" }
+      nil
+    end
+  end
+
   test "renders shop page with next link when more products exist" do
     get "/shop", params: { per: 2 }
 
@@ -30,5 +43,25 @@ class StorefrontShopTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", "No products available yet"
+  end
+
+  test "shows fallback alert when live storefront query fails" do
+    with_storefront_client(FakeClient.new) do
+      get "/shop"
+    end
+
+    assert_response :success
+    assert_select ".flash.alert", /showing showcase products/
+  end
+
+  private
+
+  def with_storefront_client(fake_client)
+    client_singleton = Shopify::StorefrontClient.singleton_class
+    original_new = Shopify::StorefrontClient.method(:new)
+    client_singleton.define_method(:new) { |*_args, **_kwargs| fake_client }
+    yield
+  ensure
+    client_singleton.define_method(:new, original_new)
   end
 end

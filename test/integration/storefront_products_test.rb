@@ -1,6 +1,19 @@
 require "test_helper"
 
 class StorefrontProductsTest < ActionDispatch::IntegrationTest
+  class FakeClient
+    attr_reader :last_error
+
+    def configured?
+      true
+    end
+
+    def query(query:, variables: {})
+      @last_error = { type: :timeout, message: "timeout" }
+      nil
+    end
+  end
+
   test "shows fallback product detail page" do
     get "/products/sample-001"
 
@@ -13,5 +26,25 @@ class StorefrontProductsTest < ActionDispatch::IntegrationTest
     get "/products/not-a-real-product"
 
     assert_response :not_found
+  end
+
+  test "shows fallback alert on home page when live query fails" do
+    with_storefront_client(FakeClient.new) do
+      get "/"
+    end
+
+    assert_response :success
+    assert_select ".flash.alert", /showing showcase products/
+  end
+
+  private
+
+  def with_storefront_client(fake_client)
+    client_singleton = Shopify::StorefrontClient.singleton_class
+    original_new = Shopify::StorefrontClient.method(:new)
+    client_singleton.define_method(:new) { |*_args, **_kwargs| fake_client }
+    yield
+  ensure
+    client_singleton.define_method(:new, original_new)
   end
 end
