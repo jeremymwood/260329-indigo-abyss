@@ -12,4 +12,9 @@ Rails.application.routes.draw do
   root "storefront#index"
   get "shop", to: "storefront#shop", as: :shop
   get "products/*id", to: "storefront#show", as: :product
+
+  get "cart", to: "cart#show", as: :cart
+  post "cart/items", to: "cart#create", as: :cart_items
+  patch "cart/items/*id", to: "cart#update", as: :update_cart_item
+  delete "cart/items/*id", to: "cart#destroy", as: :remove_cart_item
 end

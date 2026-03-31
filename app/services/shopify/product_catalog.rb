@@ -201,16 +201,7 @@ module Shopify
       end
 
       window = rows[start_index...end_index] || []
-      cards = window.map do |row|
-        ProductCard.new(
-          id: row[:id],
-          handle: row[:handle],
-          title: row[:title],
-          description: truncate(row[:description]),
-          image_url: row[:image_url],
-          price: row[:price]
-        )
-      end
+      cards = window.map { |row| fallback_row_to_card(row, truncate_description: true) }
 
       has_previous = start_index.positive?
       has_next = end_index < rows.length
@@ -235,13 +226,19 @@ module Shopify
     end
 
     def to_product_card(node, truncate_description:)
+      price_node = node.dig("priceRange", "minVariantPrice") || {}
+      amount = price_node["amount"]&.to_f
+      currency = price_node["currencyCode"]
+
       ProductCard.new(
         id: node["id"],
         handle: node["handle"],
         title: node["title"],
         description: truncate_description ? truncate(node["description"]) : detail_copy(node["description"]),
         image_url: node.dig("featuredImage", "url") || fallback_image,
-        price: money_label(node.dig("priceRange", "minVariantPrice"))
+        price: money_label(amount: amount, currency: currency),
+        price_amount: amount,
+        currency_code: currency
       )
     end
 
@@ -250,20 +247,24 @@ module Shopify
       row = fallback_rows.find { |item| item[:id] == decoded_identifier || item[:handle] == decoded_identifier }
       return nil if row.blank?
 
-      ProductCard.new(**row)
+      fallback_row_to_card(row, truncate_description: false)
     end
 
     def fallback_products
-      fallback_rows.map do |row|
-        ProductCard.new(
-          id: row[:id],
-          handle: row[:handle],
-          title: row[:title],
-          description: truncate(row[:description]),
-          image_url: row[:image_url],
-          price: row[:price]
-        )
-      end
+      fallback_rows.map { |row| fallback_row_to_card(row, truncate_description: true) }
+    end
+
+    def fallback_row_to_card(row, truncate_description:)
+      ProductCard.new(
+        id: row[:id],
+        handle: row[:handle],
+        title: row[:title],
+        description: truncate_description ? truncate(row[:description]) : detail_copy(row[:description]),
+        image_url: row[:image_url],
+        price: row[:price],
+        price_amount: row[:price_amount],
+        currency_code: row[:currency_code]
+      )
     end
 
     def encode_fallback_cursor(index)
@@ -287,7 +288,9 @@ module Shopify
           title: "Abyss Selvedge 14oz",
           description: "Straight fit, loom-state selvedge woven for high-contrast fades and long break-in life.",
           image_url: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 168.00"
+          price: "USD 168.00",
+          price_amount: 168.00,
+          currency_code: "USD"
         },
         {
           id: "sample-002",
@@ -295,7 +298,9 @@ module Shopify
           title: "Nocturne Taper 13oz",
           description: "Roomy top block with an aggressive taper and deep indigo cast for clean vertical fade lines.",
           image_url: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 154.00"
+          price: "USD 154.00",
+          price_amount: 154.00,
+          currency_code: "USD"
         },
         {
           id: "sample-003",
@@ -303,16 +308,17 @@ module Shopify
           title: "Rinse Black Warp 12oz",
           description: "Sulfur-black warp with indigo core yarn for tone-rich wear patterns and subtle electric highs.",
           image_url: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 182.00"
+          price: "USD 182.00",
+          price_amount: 182.00,
+          currency_code: "USD"
         }
       ]
     end
 
-    def money_label(price_node)
-      return "Price unavailable" if price_node.blank?
+    def money_label(amount:, currency:)
+      return "Price unavailable" if amount.blank? || currency.blank?
 
-      amount = format("%.2f", price_node["amount"].to_f)
-      "#{price_node["currencyCode"]} #{amount}"
+      "#{currency} #{format('%.2f', amount)}"
     end
 
     def truncate(text, max = 100)

@@ -1,0 +1,43 @@
+<% content_for :title, "Cart | Indigo Abyss" %>
+
+<main class="site-shell">
+  <section class="hero">
+    <p class="eyebrow">Session Cart</p>
+    <h1>Your Cart</h1>
+    <p class="lead">Review your selected denim before checkout handoff.</p>
+  </section>
+
+  <% if @line_items.empty? %>
+    <section class="empty-state" aria-live="polite">
+      <h2>Your cart is empty</h2>
+      <p>Add a product from the collection to start your order.</p>
+      <%= link_to "Browse Collection", shop_path, class: "pagination-link" %>
+    </section>
+  <% else %>
+    <section class="cart-list" aria-label="Cart items">
+      <% @line_items.each do |line| %>
+        <article class="cart-item">
+          <img src="<%= line.product.image_url %>" alt="<%= line.product.title %>" class="cart-item-image" loading="lazy">
+          <div class="cart-item-content">
+            <h2><%= line.product.title %></h2>
+            <p class="cart-item-price"><%= line.product.price %></p>
+            <p class="cart-item-subtotal">Subtotal: <%= line.currency_code %> <%= format("%.2f", line.subtotal_amount) %></p>
+            <div class="cart-item-controls">
+              <%= form_with url: update_cart_item_path(line.identifier), method: :patch, local: true, class: "cart-qty-form" do |f| %>
+                <%= f.label :quantity, "Qty" %>
+                <%= f.number_field :quantity, value: line.quantity, min: 1, max: 50, class: "qty-input" %>
+                <%= f.submit "Update", class: "pagination-link button-link" %>
+              <% end %>
+              <%= button_to "Remove", remove_cart_item_path(line.identifier), method: :delete, class: "pagination-link button-link danger" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </section>
+
+    <section class="cart-summary">
+      <p>Total</p>
+      <strong><%= @currency %> <%= format("%.2f", @total_amount) %></strong>
+    </section>
+  <% end %>
+</main>
