@@ -1,8 +1,11 @@
 require "cgi"
 require "base64"
+require "yaml"
 
 module Shopify
   class ProductCatalog
+    FALLBACK_PRODUCTS_PATH = Rails.root.join("config/fallback_products.yml").freeze
+
     FEATURED_PRODUCTS_QUERY = <<~GRAPHQL
       query DenimShowcase($first: Int!) {
         products(first: $first, sortKey: BEST_SELLING) {
@@ -308,41 +311,18 @@ module Shopify
     end
 
     def fallback_rows
-      [
-        {
-          id: "sample-001",
-          handle: "abyss-selvedge-14oz",
-          title: "Abyss Selvedge 14oz",
-          description: "Straight fit, loom-state selvedge woven for high-contrast fades and long break-in life.",
-          image_url: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 168.00",
-          price_amount: 168.00,
-          currency_code: "USD",
-          variant_id: "gid://shopify/ProductVariant/401001"
-        },
-        {
-          id: "sample-002",
-          handle: "nocturne-taper-13oz",
-          title: "Nocturne Taper 13oz",
-          description: "Roomy top block with an aggressive taper and deep indigo cast for clean vertical fade lines.",
-          image_url: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 154.00",
-          price_amount: 154.00,
-          currency_code: "USD",
-          variant_id: "gid://shopify/ProductVariant/401002"
-        },
-        {
-          id: "sample-003",
-          handle: "rinse-black-warp-12oz",
-          title: "Rinse Black Warp 12oz",
-          description: "Sulfur-black warp with indigo core yarn for tone-rich wear patterns and subtle electric highs.",
-          image_url: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80",
-          price: "USD 182.00",
-          price_amount: 182.00,
-          currency_code: "USD",
-          variant_id: "gid://shopify/ProductVariant/401003"
-        }
-      ]
+      @fallback_rows ||= begin
+        rows = YAML.safe_load_file(FALLBACK_PRODUCTS_PATH, permitted_classes: [], aliases: false)
+        Array(rows).map { |row| normalize_fallback_row(row) }
+      rescue StandardError
+        []
+      end
+    end
+
+    def normalize_fallback_row(row)
+      normalized = row.to_h.transform_keys(&:to_sym)
+      normalized[:price_amount] = normalized[:price_amount].to_f if normalized[:price_amount].present?
+      normalized
     end
 
     def money_label(amount:, currency:)

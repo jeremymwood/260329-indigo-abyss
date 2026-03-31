@@ -37,6 +37,20 @@ Set these values in your environment (or `.env` via your preferred loader):
 - `SHOPIFY_STOREFRONT_ACCESS_TOKEN`
 
 If these are missing, the homepage runs in showcase mode with curated sample denim products.
+The fallback product source is maintained in `config/fallback_products.yml`.
+
+## Optional pre-push checks
+
+Install project git hooks once:
+
+```bash
+ruby bin/install-hooks
+```
+
+Then every `git push` runs:
+
+- `bin/rubocop`
+- `bin/rails test`
 
 ## Current app behavior
 
