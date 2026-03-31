@@ -26,7 +26,7 @@ class StorefrontController < ApplicationController
     requested = params[:per].to_i
     return 12 if requested <= 0
 
-    [requested, 24].min
+    [ requested, 24 ].min
   end
 
   def render_not_found

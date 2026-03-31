@@ -188,16 +188,16 @@ module Shopify
       rows = fallback_rows
       return ProductPage.new(products: [], next_cursor: nil, prev_cursor: nil) if rows.blank?
 
-      per_page = [[first.to_i, 1].max, 24].min
+      per_page = [ [ first.to_i, 1 ].max, 24 ].min
 
       if before.present?
         end_index = decode_fallback_cursor(before) || rows.length
-        end_index = [[end_index, 0].max, rows.length].min
-        start_index = [end_index - per_page, 0].max
+        end_index = [ [ end_index, 0 ].max, rows.length ].min
+        start_index = [ end_index - per_page, 0 ].max
       else
         start_index = after.present? ? (decode_fallback_cursor(after).to_i + 1) : 0
-        start_index = [[start_index, 0].max, rows.length].min
-        end_index = [start_index + per_page, rows.length].min
+        start_index = [ [ start_index, 0 ].max, rows.length ].min
+        end_index = [ start_index + per_page, rows.length ].min
       end
 
       window = rows[start_index...end_index] || []

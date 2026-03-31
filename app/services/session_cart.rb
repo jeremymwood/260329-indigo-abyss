@@ -76,14 +76,14 @@ class SessionCart
     qty = value.to_i
     return 1 if qty <= 0
 
-    [qty, 50].min
+    [ qty, 50 ].min
   end
 
   def normalize_update_quantity(value)
     qty = value.to_i
     return 0 if qty <= 0
 
-    [qty, 50].min
+    [ qty, 50 ].min
   end
 
   def unit_price_amount(product)
