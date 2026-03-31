@@ -21,6 +21,11 @@ module Shopify
                 currencyCode
               }
             }
+            variants(first: 1) {
+              nodes {
+                id
+              }
+            }
           }
         }
       }
@@ -44,6 +49,11 @@ module Shopify
                 minVariantPrice {
                   amount
                   currencyCode
+                }
+              }
+              variants(first: 1) {
+                nodes {
+                  id
                 }
               }
             }
@@ -76,6 +86,11 @@ module Shopify
                   currencyCode
                 }
               }
+              variants(first: 1) {
+                nodes {
+                  id
+                }
+              }
             }
           }
           pageInfo {
@@ -103,6 +118,11 @@ module Shopify
               currencyCode
             }
           }
+          variants(first: 1) {
+            nodes {
+              id
+            }
+          }
         }
       }
     GRAPHQL
@@ -123,6 +143,11 @@ module Shopify
               minVariantPrice {
                 amount
                 currencyCode
+              }
+            }
+            variants(first: 1) {
+              nodes {
+                id
               }
             }
           }
@@ -238,7 +263,8 @@ module Shopify
         image_url: node.dig("featuredImage", "url") || fallback_image,
         price: money_label(amount: amount, currency: currency),
         price_amount: amount,
-        currency_code: currency
+        currency_code: currency,
+        variant_id: node.dig("variants", "nodes", 0, "id")
       )
     end
 
@@ -263,7 +289,8 @@ module Shopify
         image_url: row[:image_url],
         price: row[:price],
         price_amount: row[:price_amount],
-        currency_code: row[:currency_code]
+        currency_code: row[:currency_code],
+        variant_id: row[:variant_id]
       )
     end
 
@@ -290,7 +317,8 @@ module Shopify
           image_url: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80",
           price: "USD 168.00",
           price_amount: 168.00,
-          currency_code: "USD"
+          currency_code: "USD",
+          variant_id: "gid://shopify/ProductVariant/401001"
         },
         {
           id: "sample-002",
@@ -300,7 +328,8 @@ module Shopify
           image_url: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80",
           price: "USD 154.00",
           price_amount: 154.00,
-          currency_code: "USD"
+          currency_code: "USD",
+          variant_id: "gid://shopify/ProductVariant/401002"
         },
         {
           id: "sample-003",
@@ -310,7 +339,8 @@ module Shopify
           image_url: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80",
           price: "USD 182.00",
           price_amount: 182.00,
-          currency_code: "USD"
+          currency_code: "USD",
+          variant_id: "gid://shopify/ProductVariant/401003"
         }
       ]
     end

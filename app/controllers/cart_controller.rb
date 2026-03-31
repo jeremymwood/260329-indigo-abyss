@@ -20,6 +20,17 @@ class CartController < ApplicationController
     redirect_to cart_path, notice: "Item removed."
   end
 
+  def checkout
+    checkout_lines = cart.checkout_lines(catalog: Shopify::ProductCatalog.new)
+    result = Shopify::CheckoutUrlBuilder.new.build(lines: checkout_lines)
+
+    if result.ok?
+      redirect_to result.url, allow_other_host: true
+    else
+      redirect_to cart_path, alert: result.error
+    end
+  end
+
   private
 
   def cart

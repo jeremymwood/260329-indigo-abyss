@@ -326,6 +326,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .cart-summary p,
@@ -355,4 +357,24 @@ body {
   .product-detail-image {
     min-height: 260px;
   }
+}
+
+
+
+
+.flash {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.flash.notice {
+  background: #0f3322;
+  color: #b2f5cf;
+}
+
+.flash.alert {
+  background: #4a1822;
+  color: #ffd0d9;
 }
