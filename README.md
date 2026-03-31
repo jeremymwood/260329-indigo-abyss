@@ -52,6 +52,13 @@ Then every `git push` runs:
 - `bin/rubocop`
 - `bin/rails test`
 
+## Environment Variable Safety
+
+- Do not commit `.env` or token files.
+- Keep secrets in local environment variables or GitHub repository secrets.
+- Rotate tokens immediately if they are exposed.
+- Review guardrails in [Secrets and Environment Safety](docs/security-secrets.md).
+
 ## Current app behavior
 
 - `/` renders a branded Indigo Abyss homepage.
