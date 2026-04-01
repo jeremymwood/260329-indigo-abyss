@@ -1,4 +1,5 @@
 # Indigo Abyss
+[![CI](https://github.com/jeremymwood/260329-indigo-abyss/actions/workflows/ci.yml/badge.svg)](https://github.com/jeremymwood/260329-indigo-abyss/actions/workflows/ci.yml)
 
 A Ruby on Rails storefront for a denim brand, wired to Shopify Storefront API.
 
@@ -51,6 +52,16 @@ Then every `git push` runs:
 
 - `bin/rubocop`
 - `bin/rails test`
+
+## Local Developer Commands
+
+- Start server: `bin/rails server`
+- Run tests: `bin/rails test`
+- Run lint: `bin/rubocop`
+- Run security scan: `bin/brakeman --no-pager`
+- Run pre-push checks manually: `ruby bin/prepush`
+
+Full workflow + troubleshooting: [Developer Runbook](docs/developer-runbook.md)
 
 ## Environment Variable Safety
 
