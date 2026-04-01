@@ -382,6 +382,13 @@ body {
   margin: 0;
 }
 
+.cart-checkout-note {
+  width: 100%;
+  margin: 0.15rem 0 0;
+  color: #c7d7ff;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 860px) {
   .product-detail {
     grid-template-columns: 1fr;
@@ -430,4 +437,5 @@ body {
   background: #4a1822;
   color: #ffd0d9;
 }
+
 

@@ -38,7 +38,10 @@
     <section class="cart-summary">
       <p>Total</p>
       <strong><%= @currency %> <%= format("%.2f", @total_amount) %></strong>
-      <%= button_to "Checkout", cart_checkout_path, method: :post, class: "pagination-link button-link" %>
+      <%= button_to "Continue to Secure Checkout", cart_checkout_path, method: :post, class: "pagination-link button-link" %>
+      <p class="cart-checkout-note">
+        Accelerated options (Shop Pay, Apple Pay, Google Pay, and PayPal) appear on Shopify checkout when enabled on your store.
+      </p>
     </section>
   <% end %>
 </main>
