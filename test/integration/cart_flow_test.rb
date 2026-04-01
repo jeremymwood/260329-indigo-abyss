@@ -51,4 +51,13 @@ class CartFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select ".alert", /Cart contains invalid items/
   end
+
+  test "cart page communicates accelerated checkout options" do
+    post "/cart/items", params: { product_id: "abyss-selvedge-14oz", quantity: 1 }
+    follow_redirect!
+
+    assert_response :success
+    assert_select "form button", "Continue to Secure Checkout"
+    assert_select ".cart-checkout-note", /Shop Pay, Apple Pay, Google Pay, and PayPal/
+  end
 end

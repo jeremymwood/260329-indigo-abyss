@@ -39,6 +39,7 @@ Set these values in your environment (or `.env` via your preferred loader):
 
 If these are missing, the homepage runs in showcase mode with curated sample denim products.
 The fallback product source is maintained in `config/fallback_products.yml`.
+Accelerated checkout implementation notes: [Accelerated Checkout Decision](docs/accelerated-checkout.md).
 
 ## Optional pre-push checks
 
