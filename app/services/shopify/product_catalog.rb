@@ -5,6 +5,7 @@ require "yaml"
 module Shopify
   class ProductCatalog
     FALLBACK_PRODUCTS_PATH = Rails.root.join("config/fallback_products.yml").freeze
+    SUPPORTED_CATEGORIES = %w[pants shirts jackets accessories].freeze
 
     FEATURED_PRODUCTS_QUERY = <<~GRAPHQL
       query DenimShowcase($first: Int!) {
@@ -14,6 +15,7 @@ module Shopify
             handle
             title
             description
+            productType
             featuredImage {
               url
               altText
@@ -44,6 +46,7 @@ module Shopify
               handle
               title
               description
+              productType
               featuredImage {
                 url
                 altText
@@ -79,6 +82,7 @@ module Shopify
               handle
               title
               description
+              productType
               featuredImage {
                 url
                 altText
@@ -111,6 +115,7 @@ module Shopify
           handle
           title
           description
+          productType
           featuredImage {
             url
             altText
@@ -138,6 +143,7 @@ module Shopify
             handle
             title
             description
+            productType
             featuredImage {
               url
               altText
@@ -172,10 +178,11 @@ module Shopify
       nodes.map { |node| to_product_card(node, truncate_description: true) }
     end
 
-    def page(first:, after: nil, before: nil)
-      return fallback_page(first: first, after: after, before: before) if !@client.configured?
+    def page(first:, after: nil, before: nil, category: nil)
+      return fallback_page(first: first, after: after, before: before, category: category) if !@client.configured?
 
-      live_page(first: first, after: after, before: before) || fallback_page(first: first, after: after, before: before)
+      live_page(first: first, after: after, before: before, category: category) ||
+        fallback_page(first: first, after: after, before: before, category: category)
     end
 
     def find(identifier)
@@ -191,7 +198,7 @@ module Shopify
 
     private
 
-    def live_page(first:, after:, before:)
+    def live_page(first:, after:, before:, category:)
       if before.present?
         data = @client.query(query: PRODUCTS_PAGE_BACKWARD_QUERY, variables: { last: first, before: before })
       else
@@ -203,6 +210,7 @@ module Shopify
 
       edges = products_data["edges"] || []
       product_cards = edges.map { |edge| to_product_card(edge["node"], truncate_description: true) }
+      product_cards = filter_products_by_category(product_cards, category)
       page_info = products_data["pageInfo"] || {}
 
       ProductPage.new(
@@ -212,8 +220,8 @@ module Shopify
       )
     end
 
-    def fallback_page(first:, after:, before:)
-      rows = fallback_rows
+    def fallback_page(first:, after:, before:, category:)
+      rows = filtered_rows(category)
       return ProductPage.new(products: [], next_cursor: nil, prev_cursor: nil) if rows.blank?
 
       per_page = [ [ first.to_i, 1 ].max, 24 ].min
@@ -267,7 +275,8 @@ module Shopify
         price: money_label(amount: amount, currency: currency),
         price_amount: amount,
         currency_code: currency,
-        variant_id: node.dig("variants", "nodes", 0, "id")
+        variant_id: node.dig("variants", "nodes", 0, "id"),
+        category: normalize_category(node["productType"])
       )
     end
 
@@ -293,8 +302,39 @@ module Shopify
         price: row[:price],
         price_amount: row[:price_amount],
         currency_code: row[:currency_code],
-        variant_id: row[:variant_id]
+        variant_id: row[:variant_id],
+        category: normalize_category(row[:category])
       )
+    end
+
+    def filtered_rows(category)
+      normalized = category_filter(category)
+      return fallback_rows if normalized.nil?
+      return [] if normalized == :invalid
+
+      fallback_rows.select { |row| normalize_category(row[:category]) == normalized }
+    end
+
+    def filter_products_by_category(products, category)
+      normalized = category_filter(category)
+      return products if normalized.nil?
+      return [] if normalized == :invalid
+
+      products.select { |product| product.category == normalized }
+    end
+
+    def category_filter(value)
+      raw = value.to_s.strip.downcase
+      return nil if raw.blank?
+
+      SUPPORTED_CATEGORIES.include?(raw) ? raw : :invalid
+    end
+
+    def normalize_category(value)
+      normalized = value.to_s.strip.downcase
+      return nil if normalized.blank?
+
+      SUPPORTED_CATEGORIES.include?(normalized) ? normalized : nil
     end
 
     def encode_fallback_cursor(index)

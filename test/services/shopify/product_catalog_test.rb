@@ -52,6 +52,7 @@ module Shopify
               "handle" => "edge-selvedge",
               "title" => "Edge Selvedge",
               "description" => "Live storefront denim card",
+              "productType" => "pants",
               "featuredImage" => { "url" => "https://cdn.example.com/edge.jpg" },
               "priceRange" => {
                 "minVariantPrice" => {
@@ -73,6 +74,7 @@ module Shopify
       assert_equal "Edge Selvedge", product.title
       assert_equal "USD 199.00", product.price
       assert_equal "gid://shopify/ProductVariant/9001", product.variant_id
+      assert_equal "pants", product.category
     end
 
     test "featured falls back when live storefront data is missing" do
@@ -84,13 +86,14 @@ module Shopify
       assert_equal "Abyss Selvedge 14oz", products.first.title
     end
 
-    test "fallback fixture exposes 20 products" do
+    test "fallback fixture now includes 20 categorized products" do
       catalog = ProductCatalog.new(client: OfflineClient.new)
 
       products = catalog.featured(limit: 24)
 
       assert_equal 20, products.length
-      assert_equal "Atlas Relaxed Straight 14oz", products.last.title
+      assert_equal "pants", products.first.category
+      assert_equal "accessories", products.last.category
     end
 
     test "fallback pagination supports multiple pages with 20 items" do
@@ -105,6 +108,15 @@ module Shopify
       assert_not_nil second_page.prev_cursor
       assert_nil second_page.next_cursor
       assert_equal "Harbor Slim Straight 12oz", second_page.products.first.title
+    end
+
+    test "fallback page filters by supported category" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      page = catalog.page(first: 24, category: "jackets")
+
+      assert page.products.any?
+      assert page.products.all? { |product| product.category == "jackets" }
     end
   end
 end
