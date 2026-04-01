@@ -25,7 +25,7 @@
         <div class="site-nav-links">
           <%= link_to "Home", root_path, class: nav_link_class(:home) %>
           <%= link_to "Shop", shop_path, class: nav_link_class(:shop) %>
-          <%= link_to "Cart", cart_path, class: nav_link_class(:cart) %>
+          <%= link_to cart_nav_label, cart_path, class: nav_link_class(:cart) %>
         </div>
       </div>
     </nav>
@@ -37,3 +37,4 @@
     <%= yield %>
   </body>
 </html>
+

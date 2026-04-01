@@ -1,4 +1,8 @@
 module ApplicationHelper
+  def cart_nav_label
+    "Cart (#{cart_item_count})"
+  end
+
   def nav_link_class(section)
     classes = [ "site-nav-link" ]
     classes << "active" if nav_section == section
@@ -14,5 +18,10 @@ module ApplicationHelper
     return :shop if path.start_with?("/shop") || path.start_with?("/products")
 
     :home
+  end
+
+  def cart_item_count
+    items = session[:cart_items] || {}
+    items.values.map(&:to_i).sum
   end
 end
