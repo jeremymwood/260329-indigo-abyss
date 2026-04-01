@@ -8,6 +8,20 @@ module Shopify
       end
     end
 
+    class OnlineClient
+      def initialize(payload:)
+        @payload = payload
+      end
+
+      def configured?
+        true
+      end
+
+      def query(query:, variables: {})
+        @payload
+      end
+    end
+
     test "featured reads fallback products from config fixture" do
       catalog = ProductCatalog.new(client: OfflineClient.new)
 
@@ -27,6 +41,47 @@ module Shopify
       assert_not_nil product
       assert_equal "Nocturne Taper 13oz", product.title
       assert_equal "gid://shopify/ProductVariant/401002", product.variant_id
+    end
+
+    test "featured uses live storefront data when available" do
+      payload = {
+        "products" => {
+          "nodes" => [
+            {
+              "id" => "gid://shopify/Product/42",
+              "handle" => "edge-selvedge",
+              "title" => "Edge Selvedge",
+              "description" => "Live storefront denim card",
+              "featuredImage" => { "url" => "https://cdn.example.com/edge.jpg" },
+              "priceRange" => {
+                "minVariantPrice" => {
+                  "amount" => "199.0",
+                  "currencyCode" => "USD"
+                }
+              },
+              "variants" => {
+                "nodes" => [ { "id" => "gid://shopify/ProductVariant/9001" } ]
+              }
+            }
+          ]
+        }
+      }
+
+      catalog = ProductCatalog.new(client: OnlineClient.new(payload: payload))
+      product = catalog.featured(limit: 1).first
+
+      assert_equal "Edge Selvedge", product.title
+      assert_equal "USD 199.00", product.price
+      assert_equal "gid://shopify/ProductVariant/9001", product.variant_id
+    end
+
+    test "featured falls back when live storefront data is missing" do
+      catalog = ProductCatalog.new(client: OnlineClient.new(payload: nil))
+
+      products = catalog.featured(limit: 1)
+
+      assert_equal 1, products.length
+      assert_equal "Abyss Selvedge 14oz", products.first.title
     end
   end
 end
