@@ -22,6 +22,14 @@ class StorefrontProductsTest < ActionDispatch::IntegrationTest
     assert_select "p", /USD 168.00/
   end
 
+  test "shows fallback detail page for expanded catalog item" do
+    get "/products/atlas-relaxed-straight-14oz"
+
+    assert_response :success
+    assert_select "h1", "Atlas Relaxed Straight 14oz"
+    assert_select "p", /USD 172.00/
+  end
+
   test "renders home page with featured products" do
     get "/"
 

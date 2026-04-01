@@ -25,3 +25,156 @@
   price_amount: 182.00
   currency_code: USD
   variant_id: gid://shopify/ProductVariant/401003
+- id: sample-004
+  handle: railcar-straight-15oz
+  title: Railcar Straight 15oz
+  description: Classic straight silhouette with dense yarn tension for bold whiskers and durable structure.
+  image_url: https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80
+  price: USD 176.00
+  price_amount: 176.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401004
+- id: sample-005
+  handle: harbor-relaxed-13oz
+  title: Harbor Relaxed 13oz
+  description: Relaxed top block and easy leg shape built for everyday wear without losing clean stacks.
+  image_url: https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80
+  price: USD 149.00
+  price_amount: 149.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401005
+- id: sample-006
+  handle: arc-taper-14oz
+  title: Arc Taper 14oz
+  description: Athletic seat with controlled taper engineered for sharp lines and easy movement.
+  image_url: https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80
+  price: USD 171.00
+  price_amount: 171.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401006
+- id: sample-007
+  handle: midnight-slim-12oz
+  title: Midnight Slim 12oz
+  description: Lightweight slim denim with deep blue-black cast for fast break-in and refined fades.
+  image_url: https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80
+  price: USD 142.00
+  price_amount: 142.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401007
+- id: sample-008
+  handle: foundry-wide-16oz
+  title: Foundry Wide 16oz
+  description: Wider leg cut in heavyweight denim for dramatic drape and high-contrast wear patterns.
+  image_url: https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80
+  price: USD 194.00
+  price_amount: 194.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401008
+- id: sample-009
+  handle: low-tide-crop-11oz
+  title: Low Tide Crop 11oz
+  description: Cropped inseam with clean hem and airy weight tuned for warm weather rotations.
+  image_url: https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80
+  price: USD 133.00
+  price_amount: 133.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401009
+- id: sample-010
+  handle: ridge-regular-13oz
+  title: Ridge Regular 13oz
+  description: Balanced regular fit with subtle taper and versatile fabric for year-round use.
+  image_url: https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80
+  price: USD 158.00
+  price_amount: 158.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401010
+- id: sample-011
+  handle: polar-selvedge-15oz
+  title: Polar Selvedge 15oz
+  description: High-density selvedge weave made for crisp combs and long-term fade depth.
+  image_url: https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80
+  price: USD 186.00
+  price_amount: 186.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401011
+- id: sample-012
+  handle: furnace-taper-14oz
+  title: Furnace Taper 14oz
+  description: Structured taper with reinforced pockets and stitch density for hard daily wear.
+  image_url: https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80
+  price: USD 173.00
+  price_amount: 173.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401012
+- id: sample-013
+  handle: harbor-slim-straight-12oz
+  title: Harbor Slim Straight 12oz
+  description: Slim-straight profile with soft hand-feel that still yields authentic fade texture.
+  image_url: https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80
+  price: USD 147.00
+  price_amount: 147.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401013
+- id: sample-014
+  handle: forge-relaxed-taper-15oz
+  title: Forge Relaxed Taper 15oz
+  description: Relaxed rise with defined taper for mobility up top and cleaner ankle break.
+  image_url: https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80
+  price: USD 188.00
+  price_amount: 188.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401014
+- id: sample-015
+  handle: shadow-crop-taper-11oz
+  title: Shadow Crop Taper 11oz
+  description: Trim crop taper in lighter denim designed for summer stacks and sneaker pairings.
+  image_url: https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80
+  price: USD 136.00
+  price_amount: 136.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401015
+- id: sample-016
+  handle: kiln-regular-14oz
+  title: Kiln Regular 14oz
+  description: Regular fit with medium rise and robust twill for steady break-in progression.
+  image_url: https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80
+  price: USD 169.00
+  price_amount: 169.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401016
+- id: sample-017
+  handle: cobalt-wide-leg-13oz
+  title: Cobalt Wide Leg 13oz
+  description: Wide-leg silhouette with fluid drape and deep cobalt cast for vintage-inspired fits.
+  image_url: https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=1200&q=80
+  price: USD 161.00
+  price_amount: 161.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401017
+- id: sample-018
+  handle: vapor-skinny-10oz
+  title: Vapor Skinny 10oz
+  description: Stretch-inflected skinny profile for close fit comfort with lightweight indigo tone.
+  image_url: https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1200&q=80
+  price: USD 128.00
+  price_amount: 128.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401018
+- id: sample-019
+  handle: anvil-straight-15oz
+  title: Anvil Straight 15oz
+  description: Firm straight fit with chain-stitched hems and copper hardware for heritage detail.
+  image_url: https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1200&q=80
+  price: USD 184.00
+  price_amount: 184.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401019
+- id: sample-020
+  handle: atlas-relaxed-straight-14oz
+  title: Atlas Relaxed Straight 14oz
+  description: Relaxed straight profile balancing room and structure for all-day comfort.
+  image_url: https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80
+  price: USD 172.00
+  price_amount: 172.00
+  currency_code: USD
+  variant_id: gid://shopify/ProductVariant/401020

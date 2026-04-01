@@ -83,5 +83,28 @@ module Shopify
       assert_equal 1, products.length
       assert_equal "Abyss Selvedge 14oz", products.first.title
     end
+
+    test "fallback fixture exposes 20 products" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      products = catalog.featured(limit: 24)
+
+      assert_equal 20, products.length
+      assert_equal "Atlas Relaxed Straight 14oz", products.last.title
+    end
+
+    test "fallback pagination supports multiple pages with 20 items" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      first_page = catalog.page(first: 12)
+      second_page = catalog.page(first: 12, after: first_page.next_cursor)
+
+      assert_equal 12, first_page.products.length
+      assert_not_nil first_page.next_cursor
+      assert_equal 8, second_page.products.length
+      assert_not_nil second_page.prev_cursor
+      assert_nil second_page.next_cursor
+      assert_equal "Harbor Slim Straight 12oz", second_page.products.first.title
+    end
   end
 end
