@@ -8,10 +8,20 @@
     <p class="sublead"><%= @shopify_connected ? "Live Shopify collection" : "Showcase mode collection" %></p>
   </section>
 
+  <nav class="category-filters" aria-label="Category filters">
+    <%= link_to "All", shop_path(per: params[:per]), class: "pagination-link #{'active' if @selected_category.blank?}" %>
+    <% @categories.each do |category| %>
+      <% label = category.capitalize %>
+      <%= link_to label, shop_path(category: category, per: params[:per]), class: "pagination-link #{'active' if @selected_category == category}" %>
+    <% end %>
+  </nav>
+
   <% if @catalog_page.empty? %>
     <section class="empty-state" aria-live="polite">
       <h2>No products available yet</h2>
-      <p>We do not have any products to display right now. Please check back soon.</p>
+      <p>
+        <%= @selected_category.present? ? "No products found in #{@selected_category.capitalize}. Try another category." : "We do not have any products to display right now. Please check back soon." %>
+      </p>
       <%= link_to "Back to Home", root_path, class: "pagination-link" %>
     </section>
   <% else %>
@@ -22,6 +32,9 @@
             <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
             <div class="product-body">
               <h3><%= product.title %></h3>
+              <% if product.category.present? %>
+                <p class="product-category"><%= product.category.capitalize %></p>
+              <% end %>
               <p><%= product.description %></p>
               <span class="price"><%= product.price %></span>
             </div>
@@ -32,13 +45,13 @@
 
     <nav class="pagination-nav" aria-label="Collection pagination">
       <% if @catalog_page.prev_cursor.present? %>
-        <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+        <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
       <% else %>
         <span class="pagination-link disabled" aria-disabled="true">Previous</span>
       <% end %>
 
       <% if @catalog_page.next_cursor.present? %>
-        <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+        <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
       <% else %>
         <span class="pagination-link disabled" aria-disabled="true">Next</span>
       <% end %>

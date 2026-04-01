@@ -83,5 +83,24 @@ module Shopify
       assert_equal 1, products.length
       assert_equal "Abyss Selvedge 14oz", products.first.title
     end
+
+    test "fallback fixture now includes 20 categorized products" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      products = catalog.featured(limit: 24)
+
+      assert_equal 20, products.length
+      assert_equal "pants", products.first.category
+      assert_equal "accessories", products.last.category
+    end
+
+    test "fallback page filters by supported category" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      page = catalog.page(first: 24, category: "jackets")
+
+      assert page.products.any?
+      assert page.products.all? { |product| product.category == "jackets" }
+    end
   end
 end

@@ -13,10 +13,13 @@ class StorefrontController < ApplicationController
     catalog = Shopify::ProductCatalog.new(client: client)
 
     @shopify_connected = client.configured?
+    @categories = Shopify::ProductCatalog::SUPPORTED_CATEGORIES
+    @selected_category = params[:category].to_s.presence
     @catalog_page = catalog.page(
       first: per_page,
       after: params[:after],
-      before: params[:before]
+      before: params[:before],
+      category: @selected_category
     )
     set_storefront_notice(client)
   end

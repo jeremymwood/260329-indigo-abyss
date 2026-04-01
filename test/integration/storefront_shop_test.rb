@@ -45,6 +45,23 @@ class StorefrontShopTest < ActionDispatch::IntegrationTest
     assert_select "h2", "No products available yet"
   end
 
+  test "renders category filters and supports category query" do
+    get "/shop", params: { category: "jackets", per: 24 }
+
+    assert_response :success
+    assert_select "nav.category-filters"
+    assert_select "a.pagination-link.active", "Jackets"
+    assert_select ".product-category", minimum: 1
+    assert_select ".product-category", /Jackets/
+  end
+
+  test "renders category-specific empty message when category has no products" do
+    get "/shop", params: { category: "nonexistent", per: 24 }
+
+    assert_response :success
+    assert_select "p", /No products found in/
+  end
+
   test "shows fallback alert when live storefront query fails" do
     with_storefront_client(FakeClient.new) do
       get "/shop"

@@ -439,3 +439,23 @@ body {
 }
 
 
+.category-filters {
+  margin: 1rem 0;
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.pagination-link.active {
+  border-color: rgba(165, 201, 255, 0.9);
+  background: rgba(49, 88, 164, 0.68);
+  color: #fff;
+}
+
+.product-category {
+  margin: 0.35rem 0 0.45rem;
+  color: #aecdff;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
