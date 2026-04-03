@@ -24,6 +24,27 @@ class StorefrontController < ApplicationController
     set_storefront_notice(client)
   end
 
+  def designer
+    client = Shopify::StorefrontClient.new
+    catalog = Shopify::ProductCatalog.new(client: client)
+
+    @designer_slug = params[:slug].to_s
+    @designer_name = Shopify::ProductCatalog::SUPPORTED_DESIGNERS[@designer_slug] || @designer_slug.tr("-", " ").split.map(&:capitalize).join(" ")
+    @categories = Shopify::ProductCatalog::SUPPORTED_CATEGORIES
+    @selected_category = params[:category].to_s.presence
+    @shopify_connected = client.configured?
+
+    @catalog_page = catalog.page(
+      first: per_page,
+      after: params[:after],
+      before: params[:before],
+      category: @selected_category,
+      designer: @designer_slug
+    )
+
+    set_storefront_notice(client)
+  end
+
   def show
     client = Shopify::StorefrontClient.new
     catalog = Shopify::ProductCatalog.new(client: client)

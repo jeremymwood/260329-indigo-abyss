@@ -29,14 +29,16 @@
       <% @catalog_page.products.each do |product| %>
         <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
           <article class="product-card">
-            <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+            <div class="product-media">
+              <img class="product-image product-image-primary" src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+              <img class="product-image product-image-secondary" src="<%= product.secondary_image_url %>" alt="" aria-hidden="true" loading="lazy">
+            </div>
             <div class="product-body">
               <h3><%= product.title %></h3>
-              <% if product.category.present? %>
-                <p class="product-category"><%= product.category.capitalize %></p>
-              <% end %>
-              <p><%= product.description %></p>
-              <span class="price"><%= product.price %></span>
+              <p class="product-designer"><%= product_designer_label(product) %></p>
+              <p class="product-description"><%= product.description %></p>
+              <p class="product-category">Style: <%= product_style_label(product) %></p>
+              <p class="price"><%= product_card_price(product) %></p>
             </div>
           </article>
         <% end %>

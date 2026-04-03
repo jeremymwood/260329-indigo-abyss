@@ -6,6 +6,12 @@ module Shopify
   class ProductCatalog
     FALLBACK_PRODUCTS_PATH = Rails.root.join("config/fallback_products.yml").freeze
     SUPPORTED_CATEGORIES = %w[pants shirts jackets accessories].freeze
+    SUPPORTED_DESIGNERS = {
+      "oni-denim" => "Oni Denim",
+      "iron-heart" => "Iron Heart",
+      "samurai-jeans" => "Samurai Jeans",
+      "studio-dartisan" => "Studio D'Artisan"
+    }.freeze
 
     FEATURED_PRODUCTS_QUERY = <<~GRAPHQL
       query DenimShowcase($first: Int!) {
@@ -16,9 +22,16 @@ module Shopify
             title
             description
             productType
+            vendor
             featuredImage {
               url
               altText
+            }
+            images(first: 2) {
+              nodes {
+                url
+                altText
+              }
             }
             priceRange {
               minVariantPrice {
@@ -47,9 +60,16 @@ module Shopify
               title
               description
               productType
+              vendor
               featuredImage {
                 url
                 altText
+              }
+              images(first: 2) {
+                nodes {
+                  url
+                  altText
+                }
               }
               priceRange {
                 minVariantPrice {
@@ -83,9 +103,16 @@ module Shopify
               title
               description
               productType
+              vendor
               featuredImage {
                 url
                 altText
+              }
+              images(first: 2) {
+                nodes {
+                  url
+                  altText
+                }
               }
               priceRange {
                 minVariantPrice {
@@ -116,11 +143,18 @@ module Shopify
           title
           description
           productType
+          vendor
           featuredImage {
-            url
-            altText
-          }
-          priceRange {
+              url
+              altText
+            }
+            images(first: 2) {
+              nodes {
+                url
+                altText
+              }
+            }
+            priceRange {
             minVariantPrice {
               amount
               currencyCode
@@ -144,9 +178,16 @@ module Shopify
             title
             description
             productType
+            vendor
             featuredImage {
               url
               altText
+            }
+            images(first: 2) {
+              nodes {
+                url
+                altText
+              }
             }
             priceRange {
               minVariantPrice {
@@ -178,11 +219,11 @@ module Shopify
       nodes.map { |node| to_product_card(node, truncate_description: true) }
     end
 
-    def page(first:, after: nil, before: nil, category: nil)
-      return fallback_page(first: first, after: after, before: before, category: category) if !@client.configured?
+    def page(first:, after: nil, before: nil, category: nil, designer: nil)
+      return fallback_page(first: first, after: after, before: before, category: category, designer: designer) if !@client.configured?
 
-      live_page(first: first, after: after, before: before, category: category) ||
-        fallback_page(first: first, after: after, before: before, category: category)
+      live_page(first: first, after: after, before: before, category: category, designer: designer) ||
+        fallback_page(first: first, after: after, before: before, category: category, designer: designer)
     end
 
     def find(identifier)
@@ -198,7 +239,7 @@ module Shopify
 
     private
 
-    def live_page(first:, after:, before:, category:)
+    def live_page(first:, after:, before:, category:, designer:)
       if before.present?
         data = @client.query(query: PRODUCTS_PAGE_BACKWARD_QUERY, variables: { last: first, before: before })
       else
@@ -210,6 +251,7 @@ module Shopify
 
       edges = products_data["edges"] || []
       product_cards = edges.map { |edge| to_product_card(edge["node"], truncate_description: true) }
+      product_cards = filter_products_by_designer(product_cards, designer)
       product_cards = filter_products_by_category(product_cards, category)
       page_info = products_data["pageInfo"] || {}
 
@@ -220,8 +262,8 @@ module Shopify
       )
     end
 
-    def fallback_page(first:, after:, before:, category:)
-      rows = filtered_rows(category)
+    def fallback_page(first:, after:, before:, category:, designer:)
+      rows = filtered_rows(category: category, designer: designer)
       return ProductPage.new(products: [], next_cursor: nil, prev_cursor: nil) if rows.blank?
 
       per_page = [ [ first.to_i, 1 ].max, 24 ].min
@@ -271,13 +313,23 @@ module Shopify
         handle: node["handle"],
         title: node["title"],
         description: truncate_description ? truncate(node["description"]) : detail_copy(node["description"]),
-        image_url: node.dig("featuredImage", "url") || fallback_image,
+        image_url: primary_image_url(node),
+        secondary_image_url: secondary_image_url(node),
         price: money_label(amount: amount, currency: currency),
         price_amount: amount,
         currency_code: currency,
         variant_id: node.dig("variants", "nodes", 0, "id"),
-        category: normalize_category(node["productType"])
+        category: normalize_category(node["productType"]),
+        designer: normalize_designer(node["vendor"])
       )
+    end
+
+    def primary_image_url(node)
+      node.dig("featuredImage", "url") || node.dig("images", "nodes", 0, "url") || fallback_image
+    end
+
+    def secondary_image_url(node)
+      node.dig("images", "nodes", 1, "url") || node.dig("images", "nodes", 0, "url") || primary_image_url(node)
     end
 
     def fallback_product(identifier)
@@ -299,20 +351,25 @@ module Shopify
         title: row[:title],
         description: truncate_description ? truncate(row[:description]) : detail_copy(row[:description]),
         image_url: row[:image_url],
+        secondary_image_url: row[:secondary_image_url] || row[:image_url],
         price: row[:price],
         price_amount: row[:price_amount],
         currency_code: row[:currency_code],
         variant_id: row[:variant_id],
-        category: normalize_category(row[:category])
+        category: normalize_category(row[:category]),
+        designer: normalize_designer(row[:designer])
       )
     end
 
-    def filtered_rows(category)
-      normalized = category_filter(category)
-      return fallback_rows if normalized.nil?
-      return [] if normalized == :invalid
+    def filtered_rows(category:, designer:)
+      rows = fallback_rows
+      rows = rows.select { |row| normalize_designer(row[:designer]) == designer_filter(designer) } if designer_filter(designer).present?
 
-      fallback_rows.select { |row| normalize_category(row[:category]) == normalized }
+      category_filter_value = category_filter(category)
+      return [] if category_filter_value == :invalid
+      return rows if category_filter_value.nil?
+
+      rows.select { |row| normalize_category(row[:category]) == category_filter_value }
     end
 
     def filter_products_by_category(products, category)
@@ -323,11 +380,32 @@ module Shopify
       products.select { |product| product.category == normalized }
     end
 
+    def filter_products_by_designer(products, designer)
+      normalized = designer_filter(designer)
+      return products if normalized.blank?
+
+      products.select { |product| product.designer == normalized }
+    end
+
     def category_filter(value)
       raw = value.to_s.strip.downcase
       return nil if raw.blank?
 
       SUPPORTED_CATEGORIES.include?(raw) ? raw : :invalid
+    end
+
+    def designer_filter(value)
+      normalized = normalize_designer(value)
+      return nil if normalized.blank?
+
+      normalized
+    end
+
+    def normalize_designer(value)
+      raw = value.to_s.strip.downcase
+      return nil if raw.blank?
+
+      raw.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|\-\z/, "")
     end
 
     def normalize_category(value)

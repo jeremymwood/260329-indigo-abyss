@@ -14,6 +14,7 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
@@ -23,38 +24,51 @@
       <div class="site-nav-inner">
         <div class="site-nav-top">
           <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
-          <div class="site-nav-utilities">
-            <%= link_to "Search", shop_path, class: utility_link_class(:shop) %>
-            <%= link_to "Account", root_path, class: utility_link_class %>
-            <%= link_to cart_nav_label, cart_path, class: utility_link_class(:cart) %>
-          </div>
-        </div>
 
-        <div class="site-nav-menu">
-          <%= link_to "New Arrivals", shop_path, class: nav_link_class(:shop) %>
+          <div class="site-nav-menu">
+            <%= link_to "New Arrivals", shop_path, class: nav_link_class(:shop) %>
 
-          <div class="site-nav-dropdown">
-            <button type="button" class="site-nav-dropdown-toggle">Designers</button>
-            <div class="site-nav-panel">
-              <%= link_to "Indigo Abyss", shop_path %>
-              <%= link_to "Abyss Line", shop_path %>
-              <%= link_to "Nocturne", shop_path %>
-              <%= link_to "Railcar", shop_path %>
+            <div class="site-nav-dropdown">
+              <button type="button" class="site-nav-dropdown-toggle">Designers</button>
+              <div class="site-nav-panel">
+                <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
+                <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
+                <%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %>
+                <%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %>
+              </div>
             </div>
-          </div>
 
-          <div class="site-nav-dropdown">
-            <button type="button" class="site-nav-dropdown-toggle">Categories</button>
-            <div class="site-nav-panel">
-              <%= link_to "Pants", shop_path(category: "pants") %>
-              <%= link_to "Shirts", shop_path(category: "shirts") %>
-              <%= link_to "Jackets", shop_path(category: "jackets") %>
-              <%= link_to "Accessories", shop_path(category: "accessories") %>
+            <div class="site-nav-dropdown">
+              <button type="button" class="site-nav-dropdown-toggle">Categories</button>
+              <div class="site-nav-panel">
+                <%= link_to "Pants", shop_path(category: "pants") %>
+                <%= link_to "Shirts", shop_path(category: "shirts") %>
+                <%= link_to "Jackets", shop_path(category: "jackets") %>
+                <%= link_to "Accessories", shop_path(category: "accessories") %>
+              </div>
             </div>
+
+            <%= link_to "Gift Card", root_path, class: "site-nav-link" %>
+            <%= link_to "Sale", shop_path, class: "site-nav-link" %>
           </div>
 
-          <%= link_to "Gift Card", root_path, class: "site-nav-link" %>
-          <%= link_to "Sale", shop_path, class: "site-nav-link" %>
+          <div class="site-nav-utilities" aria-label="Utility links">
+            <%= link_to shop_path, class: "#{utility_link_class(:shop)} icon-link", aria: { label: "Search" }, title: "Search" do %>
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <span class="sr-only">Search</span>
+            <% end %>
+
+            <%= link_to root_path, class: "#{utility_link_class} icon-link", aria: { label: "Account" }, title: "Account" do %>
+              <i class="fa-regular fa-user" aria-hidden="true"></i>
+              <span class="sr-only">Account</span>
+            <% end %>
+
+            <%= link_to cart_path, class: "#{utility_link_class(:cart)} icon-link cart-icon-link", aria: { label: cart_nav_label }, title: cart_nav_label do %>
+              <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+              <span class="cart-count-badge"><%= cart_count %></span>
+              <span class="sr-only"><%= cart_nav_label %></span>
+            <% end %>
+          </div>
         </div>
       </div>
     </nav>
