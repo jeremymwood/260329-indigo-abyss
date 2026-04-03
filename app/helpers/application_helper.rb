@@ -9,6 +9,12 @@ module ApplicationHelper
     classes.join(" ")
   end
 
+  def utility_link_class(section = nil)
+    classes = [ "site-nav-utility-link" ]
+    classes << "active" if section.present? && nav_section == section
+    classes.join(" ")
+  end
+
   private
 
   def nav_section

@@ -1,43 +1,46 @@
 require "test_helper"
 
 class NavigationTest < ActionDispatch::IntegrationTest
-  test "renders nav with home active on root" do
+  test "renders retail-style header menu on root" do
     get "/"
 
     assert_response :success
     assert_select "nav.site-nav"
-    assert_select "a.site-nav-link", text: "Home"
-    assert_select "a.site-nav-link", text: "Shop"
-    assert_select "a.site-nav-link", text: "Cart (0)"
-    assert_select "a.site-nav-link.active", text: "Home"
+    assert_select "a.site-brand", "Indigo Abyss"
+    assert_select "a.site-nav-link", text: "New Arrivals"
+    assert_select "summary", "Designers"
+    assert_select "summary", "Categories"
+    assert_select "a.site-nav-link", text: "Gift Card"
+    assert_select "a.site-nav-link", text: "Sale"
+    assert_select "a.site-nav-utility-link", text: "Cart (0)"
   end
 
-  test "renders nav with shop active on shop page" do
+  test "shop page marks new arrivals link active" do
     get "/shop"
 
     assert_response :success
-    assert_select "a.site-nav-link.active", text: "Shop"
+    assert_select "a.site-nav-link.active", text: "New Arrivals"
   end
 
-  test "renders nav with shop active on product detail page" do
+  test "product detail page keeps shop navigation active" do
     get "/products/sample-001"
 
     assert_response :success
-    assert_select "a.site-nav-link.active", text: "Shop"
+    assert_select "a.site-nav-link.active", text: "New Arrivals"
   end
 
-  test "renders nav with cart active on cart page" do
+  test "cart page marks utility cart link active" do
     get "/cart"
 
     assert_response :success
-    assert_select "a.site-nav-link.active", text: "Cart (0)"
+    assert_select "a.site-nav-utility-link.active", text: "Cart (0)"
   end
 
-  test "updates cart nav count after adding item" do
+  test "cart utility count updates after adding item" do
     post "/cart/items", params: { product_id: "abyss-selvedge-14oz", quantity: 2 }
     follow_redirect!
 
     assert_response :success
-    assert_select "a.site-nav-link", text: "Cart (2)"
+    assert_select "a.site-nav-utility-link", text: "Cart (2)"
   end
 end

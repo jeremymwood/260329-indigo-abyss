@@ -21,11 +21,40 @@
   <body>
     <nav class="site-nav" aria-label="Primary">
       <div class="site-nav-inner">
-        <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
-        <div class="site-nav-links">
-          <%= link_to "Home", root_path, class: nav_link_class(:home) %>
-          <%= link_to "Shop", shop_path, class: nav_link_class(:shop) %>
-          <%= link_to cart_nav_label, cart_path, class: nav_link_class(:cart) %>
+        <div class="site-nav-top">
+          <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
+          <div class="site-nav-utilities">
+            <%= link_to "Search", shop_path, class: utility_link_class(:shop) %>
+            <%= link_to "Account", root_path, class: utility_link_class %>
+            <%= link_to cart_nav_label, cart_path, class: utility_link_class(:cart) %>
+          </div>
+        </div>
+
+        <div class="site-nav-menu">
+          <%= link_to "New Arrivals", shop_path, class: nav_link_class(:shop) %>
+
+          <details class="site-nav-dropdown">
+            <summary>Designers</summary>
+            <div class="site-nav-panel">
+              <%= link_to "Indigo Abyss", shop_path %>
+              <%= link_to "Abyss Line", shop_path %>
+              <%= link_to "Nocturne", shop_path %>
+              <%= link_to "Railcar", shop_path %>
+            </div>
+          </details>
+
+          <details class="site-nav-dropdown">
+            <summary>Categories</summary>
+            <div class="site-nav-panel">
+              <%= link_to "Pants", shop_path(category: "pants") %>
+              <%= link_to "Shirts", shop_path(category: "shirts") %>
+              <%= link_to "Jackets", shop_path(category: "jackets") %>
+              <%= link_to "Accessories", shop_path(category: "accessories") %>
+            </div>
+          </details>
+
+          <%= link_to "Gift Card", root_path, class: "site-nav-link" %>
+          <%= link_to "Sale", shop_path, class: "site-nav-link" %>
         </div>
       </div>
     </nav>
@@ -37,4 +66,3 @@
     <%= yield %>
   </body>
 </html>
-
