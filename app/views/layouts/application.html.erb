@@ -33,25 +33,25 @@
         <div class="site-nav-menu">
           <%= link_to "New Arrivals", shop_path, class: nav_link_class(:shop) %>
 
-          <details class="site-nav-dropdown">
-            <summary>Designers</summary>
+          <div class="site-nav-dropdown">
+            <button type="button" class="site-nav-dropdown-toggle">Designers</button>
             <div class="site-nav-panel">
               <%= link_to "Indigo Abyss", shop_path %>
               <%= link_to "Abyss Line", shop_path %>
               <%= link_to "Nocturne", shop_path %>
               <%= link_to "Railcar", shop_path %>
             </div>
-          </details>
+          </div>
 
-          <details class="site-nav-dropdown">
-            <summary>Categories</summary>
+          <div class="site-nav-dropdown">
+            <button type="button" class="site-nav-dropdown-toggle">Categories</button>
             <div class="site-nav-panel">
               <%= link_to "Pants", shop_path(category: "pants") %>
               <%= link_to "Shirts", shop_path(category: "shirts") %>
               <%= link_to "Jackets", shop_path(category: "jackets") %>
               <%= link_to "Accessories", shop_path(category: "accessories") %>
             </div>
-          </details>
+          </div>
 
           <%= link_to "Gift Card", root_path, class: "site-nav-link" %>
           <%= link_to "Sale", shop_path, class: "site-nav-link" %>
