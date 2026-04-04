@@ -69,7 +69,6 @@ body {
   background: transparent;
   list-style: none;
   cursor: pointer;
-  font-weight: 600;
   transition: color 120ms ease, background-color 120ms ease;
 }
 
@@ -79,9 +78,28 @@ body {
 .site-nav-dropdown-toggle:focus-visible,
 .site-nav-link.active,
 .site-nav-dropdown-toggle.active {
-  color: var(--text);
-  background: var(--hover);
+  background: transparent;
   outline: none;
+}
+
+.nav-hover-cyan:hover,
+.nav-hover-cyan:focus-visible,
+.nav-hover-cyan.active {
+  color: #06b6d4;
+}
+
+.sale-link {
+  color: #dc2626;
+}
+
+.sale-link:hover,
+.sale-link:focus-visible,
+.sale-link.active {
+  color: #b91c1c;
+  background: linear-gradient(90deg, #ef4444 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .site-nav-dropdown {
@@ -126,7 +144,8 @@ body {
 }
 
 .site-nav-panel a:hover {
-  background: var(--hover);
+  background: transparent;
+  color: #4ec7ff;
 }
 
 .site-nav-utilities {

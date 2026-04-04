@@ -19,19 +19,21 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_select "a.site-nav-utility-link .cart-count-badge", text: "0"
   end
 
-  test "shop page marks new arrivals link active" do
+  test "shop page keeps new arrivals styled without active state" do
     get "/shop"
 
     assert_response :success
-    assert_select "a.site-nav-link.active", text: "New Arrivals"
+    assert_select "a.site-nav-link.nav-hover-cyan", text: "New Arrivals"
+    assert_select "a.site-nav-link.active", false
     assert_select "a.site-nav-utility-link.active[aria-label='Search']"
   end
 
-  test "product detail page keeps shop navigation active" do
+  test "product detail page keeps new arrivals neutral" do
     get "/products/sample-001"
 
     assert_response :success
-    assert_select "a.site-nav-link.active", text: "New Arrivals"
+    assert_select "a.site-nav-link.nav-hover-cyan", text: "New Arrivals"
+    assert_select "a.site-nav-link.active", false
   end
 
   test "cart page marks utility cart link active" do

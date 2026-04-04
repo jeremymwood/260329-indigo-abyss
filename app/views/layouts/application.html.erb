@@ -26,10 +26,10 @@
           <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
 
           <div class="site-nav-menu">
-            <%= link_to "New Arrivals", shop_path, class: nav_link_class(:shop) %>
+            <%= link_to "New Arrivals", shop_path, class: "site-nav-link nav-hover-cyan" %>
 
             <div class="site-nav-dropdown">
-              <button type="button" class="site-nav-dropdown-toggle">Designers</button>
+              <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan">Designers</button>
               <div class="site-nav-panel">
                 <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
                 <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="site-nav-dropdown">
-              <button type="button" class="site-nav-dropdown-toggle">Categories</button>
+              <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan">Categories</button>
               <div class="site-nav-panel">
                 <%= link_to "Pants", category_collection_path("pants") %>
                 <%= link_to "Shirts", category_collection_path("shirts") %>
@@ -48,8 +48,8 @@
               </div>
             </div>
 
-            <%= link_to "Gift Card", root_path, class: "site-nav-link" %>
-            <%= link_to "Sale", shop_path, class: "site-nav-link" %>
+            <%= link_to "Gift Card", root_path, class: "site-nav-link nav-hover-cyan" %>
+            <%= link_to "Sale", shop_path, class: "site-nav-link sale-link" %>
           </div>
 
           <div class="site-nav-utilities" aria-label="Utility links">
