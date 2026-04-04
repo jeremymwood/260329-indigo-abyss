@@ -292,6 +292,54 @@
       });
     }
 
+document.querySelectorAll(".hero-carousel").forEach(function (carousel) {
+  var slides = Array.from(carousel.querySelectorAll(".hero-slide"));
+  if (slides.length === 0) return;
+
+  var prev = carousel.querySelector(".hero-carousel-prev");
+  var next = carousel.querySelector(".hero-carousel-next");
+  var current = slides.findIndex(function (slide) { return slide.classList.contains("is-active"); });
+  if (current < 0) current = 0;
+  var intervalMs = parseInt(carousel.dataset.interval || "5000", 10);
+  var timer;
+
+  var render = function () {
+    slides.forEach(function (slide, idx) {
+      slide.classList.toggle("is-active", idx === current);
+    });
+  };
+
+  var go = function (idx) {
+    current = (idx + slides.length) % slides.length;
+    render();
+  };
+
+  var start = function () {
+    if (slides.length <= 1) return;
+    clearInterval(timer);
+    timer = setInterval(function () { go(current + 1); }, intervalMs);
+  };
+
+  if (prev) {
+    prev.addEventListener("click", function () {
+      go(current - 1);
+      start();
+    });
+  }
+
+  if (next) {
+    next.addEventListener("click", function () {
+      go(current + 1);
+      start();
+    });
+  }
+
+  carousel.addEventListener("mouseenter", function () { clearInterval(timer); });
+  carousel.addEventListener("mouseleave", start);
+  render();
+  start();
+});
+
     document.querySelectorAll(".facet-pills-form").forEach(function (form) {
       var pills = Array.from(form.querySelectorAll("details.facet-pill"));
       if (pills.length === 0) return;
