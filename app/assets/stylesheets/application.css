@@ -1094,7 +1094,9 @@ body.nav-drawer-open {
   color: white;
   margin: 0;
 }
-.hero-slide-overlay:hover {
+.hero-slide-designer:hover,
+.hero-slide-title:hover,
+.hero-slide-price:hover {
   color: rgb(164, 164, 164);
 }
 
