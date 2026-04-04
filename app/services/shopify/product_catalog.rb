@@ -209,7 +209,7 @@ module Shopify
       @client = client
     end
 
-    def featured(limit: 6)
+        def featured(limit: 6)
       return fallback_products.first(limit) if !@client.configured?
 
       data = @client.query(query: FEATURED_PRODUCTS_QUERY, variables: { first: limit })
@@ -224,6 +224,12 @@ module Shopify
 
       live_page(first: first, after: after, before: before, category: category, designer: designer) ||
         fallback_page(first: first, after: after, before: before, category: category, designer: designer)
+    end
+
+    def max_price(category: nil, designer: nil)
+      rows = filtered_rows(category: category, designer: designer)
+      amounts = rows.map { |row| row[:price_amount].to_f }.select { |amount| amount.positive? }
+      amounts.max || 0
     end
 
     def find(identifier)
@@ -449,15 +455,19 @@ module Shopify
       "#{currency} #{format('%.2f', amount)}"
     end
 
-    def truncate(text, max = 100)
-      return "Raw denim engineered for long wear and clean fades." if text.blank?
-      return text if text.length <= max
+    def truncate(text, max = 52)
+      return "Straight fit." if text.blank?
 
-      "#{text[0...max].rstrip}..."
+      first_line = text.to_s.split(/[\r\n]/).first.to_s.strip
+      first_clause = first_line.split(".").first.to_s.strip
+      candidate = first_clause.presence || first_line
+      return candidate if candidate.length <= max
+
+      "#{candidate[0...max].rstrip}..."
     end
 
     def detail_copy(text)
-      return "Raw denim engineered for long wear and clean fades." if text.blank?
+      return "Straight fit." if text.blank?
 
       text
     end

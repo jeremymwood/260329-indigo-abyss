@@ -1,89 +1,109 @@
 <% content_for :title, "#{@designer_name} | Indigo Abyss" %>
 
 <main class="site-shell designer-collection">
-  <nav class="collection-breadcrumb" aria-label="Breadcrumb">
-    <%= link_to "Home", root_path %>
-    <span>/</span>
-    <%= link_to "Shop", shop_path %>
-    <span>/</span>
-    <strong><%= @designer_name %></strong>
-  </nav>
-
   <section class="collection-hero" aria-label="Collection overview">
-    <p class="eyebrow">Designer Collection</p>
     <h1><%= @designer_name %></h1>
-    <p class="lead">Browse Indigo Abyss picks from <%= @designer_name %> with fit-focused categories and curated stock.</p>
+    <p class="lead"><%= @designer_description %></p>
   </section>
 
-  <div class="collection-toolbar" aria-label="Collection toolbar">
-    <p><strong><%= @catalog_page.products.length %></strong> products shown</p>
-    <div class="collection-toolbar-actions">
-      <label for="collection-sort">Sort By</label>
-      <select id="collection-sort" disabled>
-        <option>Featured</option>
-        <option>Price: Low to High</option>
-        <option>Price: High to Low</option>
-        <option>Newest</option>
-      </select>
-    </div>
-  </div>
+  <section id="FacetFiltersForm" class="facet-pills" aria-label="Designer filters">
+    <%= form_with url: designer_collection_path(@designer_slug), method: :get, local: true, class: "facet-pills-form" do |form| %>
+      <% if params[:per].present? %>
+        <%= form.hidden_field :per, value: params[:per] %>
+      <% end %>
 
-  <div class="collection-layout">
-    <aside class="collection-sidebar" aria-label="Collection filters">
-      <h2>Shop By Category</h2>
-      <nav class="category-filters vertical" aria-label="Designer category filters">
-        <%= link_to "All", designer_collection_path(@designer_slug, per: params[:per]), class: "pagination-link #{'active' if @selected_category.blank?}" %>
-        <% @categories.each do |category| %>
-          <% label = category.capitalize %>
-          <%= link_to label, designer_collection_path(@designer_slug, category: category, per: params[:per]), class: "pagination-link #{'active' if @selected_category == category}" %>
+      <details class="facet-pill">
+        <summary>Availability</summary>
+        <div class="facet-menu">
+          <%= form.select :availability,
+                          options_for_select([["Any", ""], ["In stock", "in-stock"], ["Out of stock", "out-of-stock"]], @facet_availability),
+                          {},
+                          class: "facet-select",
+                          onchange: "this.form.requestSubmit()" %>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Price</summary>
+        <div class="facet-menu facet-price-grid">
+          <label>
+            From
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+          </label>
+          <label>
+            To
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+          </label>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Size</summary>
+        <div class="facet-menu facet-checklist">
+          <% @facet_sizes.each do |size| %>
+            <label><%= check_box_tag "sizes[]", size, @facet_selected_sizes.include?(size), onchange: "this.form.requestSubmit()" %> <%= size %></label>
+          <% end %>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Product Type</summary>
+        <div class="facet-menu facet-checklist">
+          <% @categories.each do |category| %>
+            <label><%= check_box_tag "product_types[]", category, @selected_category == category, onchange: "this.form.requestSubmit()" %> <%= category.capitalize %></label>
+          <% end %>
+        </div>
+      </details>
+
+      <div class="facet-sort-wrap">
+        <label for="designer-sort" class="sr-only">Sort By</label>
+        <%= form.select :sort_by, options_for_select(StorefrontController::SORT_OPTIONS, @facet_sort_by), {}, id: "designer-sort", class: "facet-select facet-sort", onchange: "this.form.requestSubmit()" %>
+      </div>
+    <% end %>
+  </section>
+  <section class="collection-main" aria-label="Designer products">
+    <% if @catalog_page.empty? %>
+      <section class="empty-state" aria-live="polite">
+        <h2>No products available yet</h2>
+        <p>
+          <%= @selected_category.present? ? "No #{@designer_name} products found in #{@selected_category.capitalize}." : "No products found for this designer yet." %>
+        </p>
+        <%= link_to "Browse All Products", shop_path, class: "pagination-link" %>
+      </section>
+    <% else %>
+      <section class="product-grid" aria-label="Designer products grid">
+        <% @catalog_page.products.each do |product| %>
+          <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
+            <article class="product-card">
+              <div class="product-media">
+                <img class="product-image product-image-primary" src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+                <img class="product-image product-image-secondary" src="<%= product.secondary_image_url %>" alt="" aria-hidden="true" loading="lazy">
+              </div>
+              <div class="product-body">
+                <p class="product-designer"><%= product_designer_label(product) %></p>
+                <p><%= product.title %></p>
+                <p class="product-description"><%= product.description %></p>
+                <p class="price"><%= product_card_price(product) %></p>
+              </div>
+            </article>
+          <% end %>
+        <% end %>
+      </section>
+
+      <nav class="pagination-nav" aria-label="Collection pagination">
+        <% if @catalog_page.prev_cursor.present? %>
+          <%= link_to "Previous", designer_collection_path(@designer_slug, before: @catalog_page.prev_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Previous</span>
+        <% end %>
+
+        <% if @catalog_page.next_cursor.present? %>
+          <%= link_to "Next", designer_collection_path(@designer_slug, after: @catalog_page.next_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Next</span>
         <% end %>
       </nav>
-    </aside>
-
-    <section class="collection-main" aria-label="Designer products">
-      <% if @catalog_page.empty? %>
-        <section class="empty-state" aria-live="polite">
-          <h2>No products available yet</h2>
-          <p>
-            <%= @selected_category.present? ? "No #{@designer_name} products found in #{@selected_category.capitalize}." : "No products found for this designer yet." %>
-          </p>
-          <%= link_to "Browse All Products", shop_path, class: "pagination-link" %>
-        </section>
-      <% else %>
-        <section class="product-grid" aria-label="Designer products grid">
-          <% @catalog_page.products.each do |product| %>
-            <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
-              <article class="product-card">
-                <div class="product-media">
-                  <img class="product-image product-image-primary" src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
-                  <img class="product-image product-image-secondary" src="<%= product.secondary_image_url %>" alt="" aria-hidden="true" loading="lazy">
-                </div>
-                <div class="product-body">
-                  <h3><%= product.title %></h3>
-                  <p class="product-designer"><%= product_designer_label(product) %></p>
-                  <p class="product-description"><%= product.description %></p>
-                  <p class="product-category">Style: <%= product_style_label(product) %></p>
-                  <p class="price"><%= product_card_price(product) %></p>
-                </div>
-              </article>
-            <% end %>
-          <% end %>
-        </section>
-
-        <nav class="pagination-nav" aria-label="Collection pagination">
-          <% if @catalog_page.prev_cursor.present? %>
-            <%= link_to "Previous", designer_collection_path(@designer_slug, before: @catalog_page.prev_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
-          <% else %>
-            <span class="pagination-link disabled" aria-disabled="true">Previous</span>
-          <% end %>
-
-          <% if @catalog_page.next_cursor.present? %>
-            <%= link_to "Next", designer_collection_path(@designer_slug, after: @catalog_page.next_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
-          <% else %>
-            <span class="pagination-link disabled" aria-disabled="true">Next</span>
-          <% end %>
-        </nav>
-      <% end %>
-    </section>
-  </div>
+    <% end %>
+  </section>
 </main>
+

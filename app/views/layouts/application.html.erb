@@ -41,10 +41,10 @@
             <div class="site-nav-dropdown">
               <button type="button" class="site-nav-dropdown-toggle">Categories</button>
               <div class="site-nav-panel">
-                <%= link_to "Pants", shop_path(category: "pants") %>
-                <%= link_to "Shirts", shop_path(category: "shirts") %>
-                <%= link_to "Jackets", shop_path(category: "jackets") %>
-                <%= link_to "Accessories", shop_path(category: "accessories") %>
+                <%= link_to "Pants", category_collection_path("pants") %>
+                <%= link_to "Shirts", category_collection_path("shirts") %>
+                <%= link_to "Jackets", category_collection_path("jackets") %>
+                <%= link_to "Accessories", category_collection_path("accessories") %>
               </div>
             </div>
 
@@ -78,5 +78,62 @@
       <p class="flash <%= type %>"><%= message %></p>
     <% end %>
     <%= yield %>
-  </body>
+    <footer class="site-footer" aria-label="Footer">
+      <div class="site-footer-inner">
+        <div class="footer-grid">
+          <section>
+            <h3>Shop</h3>
+            <ul>
+              <li><%= link_to "New Arrivals", shop_path %></li>
+              <li><%= link_to "Pants", category_collection_path("pants") %></li>
+              <li><%= link_to "Shirts", category_collection_path("shirts") %></li>
+              <li><%= link_to "Jackets", category_collection_path("jackets") %></li>
+              <li><%= link_to "Accessories", category_collection_path("accessories") %></li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Designers</h3>
+            <ul>
+              <li><%= link_to "Oni Denim", designer_collection_path("oni-denim") %></li>
+              <li><%= link_to "Iron Heart", designer_collection_path("iron-heart") %></li>
+              <li><%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %></li>
+              <li><%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %></li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Support</h3>
+            <ul>
+              <li><a href="#">Shipping</a></li>
+              <li><a href="#">Returns</a></li>
+              <li><a href="#">Sizing Help</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </section>
+
+          <section class="footer-signup" aria-label="Newsletter signup">
+            <h3>Newsletter</h3>
+            <p>Get drop alerts for new denim releases and restocks.</p>
+            <form class="footer-signup-form" action="#" method="get">
+              <label for="footer-email" class="sr-only">Email address</label>
+              <input id="footer-email" type="email" name="email" placeholder="Email address">
+              <button type="submit">Subscribe</button>
+            </form>
+          </section>
+        </div>
+
+        <div class="footer-base">
+          <p>&copy; <%= Time.current.year %> Indigo Abyss. All rights reserved.</p>
+          <div class="footer-icons" aria-label="Social and payment">
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+            <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-visa" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-mastercard" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-paypal" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </footer>
+</body>
 </html>

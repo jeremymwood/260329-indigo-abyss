@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   root "storefront#index"
   get "shop", to: "storefront#shop", as: :shop
+  get "categories/:category", to: "storefront#category", as: :category_collection
   get "designers/*slug", to: "storefront#designer", as: :designer_collection
   get "products/*id", to: "storefront#show", as: :product
 

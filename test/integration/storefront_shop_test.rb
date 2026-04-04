@@ -20,7 +20,7 @@ class StorefrontShopTest < ActionDispatch::IntegrationTest
     get "/shop", params: { per: 2 }
 
     assert_response :success
-    assert_select "h1", "Shop Raw Denim"
+    assert_select "h1", "Shop"
     assert_select "a", "Next"
   end
 
@@ -45,18 +45,19 @@ class StorefrontShopTest < ActionDispatch::IntegrationTest
     assert_select "h2", "No products available yet"
   end
 
-  test "renders category filters and supports category query" do
-    get "/shop", params: { category: "jackets", per: 24 }
+  test "renders facet dropdown and supports category query" do
+    get "/categories/jackets", params: { per: 24 }
 
     assert_response :success
-    assert_select "nav.category-filters"
-    assert_select "a.pagination-link.active", "Jackets"
+    assert_select "h1", "Shop Jackets"
+    assert_select "#FacetFiltersForm"
+    assert_select "input[type='checkbox'][name='product_types[]'][value='jackets'][checked='checked']"
     assert_select ".product-category", minimum: 1
     assert_select ".product-category", /Jackets/
   end
 
   test "renders category-specific empty message when category has no products" do
-    get "/shop", params: { category: "nonexistent", per: 24 }
+    get "/categories/nonexistent", params: { per: 24 }
 
     assert_response :success
     assert_select "p", /No products found in/

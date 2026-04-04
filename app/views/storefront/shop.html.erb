@@ -1,20 +1,66 @@
-<% content_for :title, "Shop | Indigo Abyss" %>
+<% content_for :title, @selected_category.present? ? "Shop #{@selected_category.to_s.tr("-", " ").titleize} | Indigo Abyss" : "Shop | Indigo Abyss" %>
 
 <main class="site-shell">
-  <section class="hero">
-    <p class="eyebrow">Indigo Abyss Collection</p>
-    <h1>Shop Raw Denim</h1>
-    <p class="lead">Browse the full Indigo Abyss catalog with cursor-based pagination.</p>
-    <p class="sublead"><%= @shopify_connected ? "Live Shopify collection" : "Showcase mode collection" %></p>
+  <section class="collection-hero" aria-label="Collection overview">
+    <h1>Shop<%= @selected_category.present? ? " #{@selected_category.to_s.tr("-", " ").titleize}" : "" %></h1>
+    <p class="lead">Explore the full Indigo Abyss catalog with smooth, cursor-based pagination designed for speed and precision, letting you seamlessly browse premium denim collections as new pieces load effortlessly with each scroll.</p>
   </section>
 
-  <nav class="category-filters" aria-label="Category filters">
-    <%= link_to "All", shop_path(per: params[:per]), class: "pagination-link #{'active' if @selected_category.blank?}" %>
-    <% @categories.each do |category| %>
-      <% label = category.capitalize %>
-      <%= link_to label, shop_path(category: category, per: params[:per]), class: "pagination-link #{'active' if @selected_category == category}" %>
+  <section id="FacetFiltersForm" class="facet-pills" aria-label="Shop filters">
+    <%= form_with url: shop_path, method: :get, local: true, class: "facet-pills-form" do |form| %>
+      <% if params[:per].present? %>
+        <%= form.hidden_field :per, value: params[:per] %>
+      <% end %>
+
+      <details class="facet-pill">
+        <summary>Availability</summary>
+        <div class="facet-menu">
+          <%= form.select :availability,
+                          options_for_select([["Any", ""], ["In stock", "in-stock"], ["Out of stock", "out-of-stock"]], @facet_availability),
+                          {},
+                          class: "facet-select",
+                          onchange: "this.form.requestSubmit()" %>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Price</summary>
+        <div class="facet-menu facet-price-grid">
+          <label>
+            From
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+          </label>
+          <label>
+            To
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+          </label>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Size</summary>
+        <div class="facet-menu facet-checklist">
+          <% @facet_sizes.each do |size| %>
+            <label><%= check_box_tag "sizes[]", size, @facet_selected_sizes.include?(size), onchange: "this.form.requestSubmit()" %> <%= size %></label>
+          <% end %>
+        </div>
+      </details>
+
+      <details class="facet-pill">
+        <summary>Product Type</summary>
+        <div class="facet-menu facet-checklist">
+          <% @categories.each do |category| %>
+            <label><%= check_box_tag "product_types[]", category, @selected_category == category, onchange: "this.form.requestSubmit()" %> <%= category.capitalize %></label>
+          <% end %>
+        </div>
+      </details>
+
+      <div class="facet-sort-wrap">
+        <label for="shop-sort" class="sr-only">Sort By</label>
+        <%= form.select :sort_by, options_for_select(StorefrontController::SORT_OPTIONS, @facet_sort_by), {}, id: "shop-sort", class: "facet-select facet-sort", onchange: "this.form.requestSubmit()" %>
+      </div>
     <% end %>
-  </nav>
+  </section>
 
   <% if @catalog_page.empty? %>
     <section class="empty-state" aria-live="polite">
@@ -34,8 +80,8 @@
               <img class="product-image product-image-secondary" src="<%= product.secondary_image_url %>" alt="" aria-hidden="true" loading="lazy">
             </div>
             <div class="product-body">
-              <h3><%= product.title %></h3>
               <p class="product-designer"><%= product_designer_label(product) %></p>
+              <p><%= product.title %></p>
               <p class="product-description"><%= product.description %></p>
               <p class="product-category">Style: <%= product_style_label(product) %></p>
               <p class="price"><%= product_card_price(product) %></p>
@@ -46,16 +92,30 @@
     </section>
 
     <nav class="pagination-nav" aria-label="Collection pagination">
-      <% if @catalog_page.prev_cursor.present? %>
-        <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
-      <% else %>
-        <span class="pagination-link disabled" aria-disabled="true">Previous</span>
-      <% end %>
+      <% if @selected_category.present? %>
+        <% if @catalog_page.prev_cursor.present? %>
+          <%= link_to "Previous", category_collection_path(@selected_category, before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Previous</span>
+        <% end %>
 
-      <% if @catalog_page.next_cursor.present? %>
-        <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
+        <% if @catalog_page.next_cursor.present? %>
+          <%= link_to "Next", category_collection_path(@selected_category, after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Next</span>
+        <% end %>
       <% else %>
-        <span class="pagination-link disabled" aria-disabled="true">Next</span>
+        <% if @catalog_page.prev_cursor.present? %>
+          <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Previous</span>
+        <% end %>
+
+        <% if @catalog_page.next_cursor.present? %>
+          <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+        <% else %>
+          <span class="pagination-link disabled" aria-disabled="true">Next</span>
+        <% end %>
       <% end %>
     </nav>
   <% end %>
