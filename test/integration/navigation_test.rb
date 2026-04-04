@@ -10,7 +10,6 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_select "a.site-nav-link", text: "New Arrivals"
     assert_select "button.site-nav-dropdown-toggle", "Designers"
     assert_select "button.site-nav-dropdown-toggle", "Categories"
-    assert_select "a.site-nav-link", text: "Gift Card"
     assert_select "a.site-nav-link", text: "Sale"
     assert_select "a.site-nav-utility-link.icon-link", count: 3
     assert_select "a.site-nav-utility-link[aria-label='Search']"

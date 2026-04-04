@@ -209,7 +209,7 @@ module Shopify
       @client = client
     end
 
-        def featured(limit: 6)
+    def featured(limit: 6)
       return fallback_products.first(limit) if !@client.configured?
 
       data = @client.query(query: FEATURED_PRODUCTS_QUERY, variables: { first: limit })
@@ -219,17 +219,22 @@ module Shopify
       nodes.map { |node| to_product_card(node, truncate_description: true) }
     end
 
-    def page(first:, after: nil, before: nil, category: nil, designer: nil)
-      return fallback_page(first: first, after: after, before: before, category: category, designer: designer) if !@client.configured?
+    def page(first:, after: nil, before: nil, category: nil, designer: nil, availability: nil, sizes: [], price_min: nil, price_max: nil, sort_by: "featured")
+      return fallback_page(first: first, after: after, before: before, category: category, designer: designer, availability: availability, sizes: sizes, price_min: price_min, price_max: price_max, sort_by: sort_by) if !@client.configured?
 
-      live_page(first: first, after: after, before: before, category: category, designer: designer) ||
-        fallback_page(first: first, after: after, before: before, category: category, designer: designer)
+      live_page(first: first, after: after, before: before, category: category, designer: designer, availability: availability, sizes: sizes, price_min: price_min, price_max: price_max, sort_by: sort_by) ||
+        fallback_page(first: first, after: after, before: before, category: category, designer: designer, availability: availability, sizes: sizes, price_min: price_min, price_max: price_max, sort_by: sort_by)
     end
 
-    def max_price(category: nil, designer: nil)
-      rows = filtered_rows(category: category, designer: designer)
+    def max_price(category: nil, designer: nil, availability: nil, sizes: [], price_min: nil, price_max: nil)
+      rows = filtered_rows(category: category, designer: designer, availability: availability, sizes: sizes, price_min: price_min, price_max: price_max, sort_by: "featured")
       amounts = rows.map { |row| row[:price_amount].to_f }.select { |amount| amount.positive? }
       amounts.max || 0
+    end
+
+    def available_sizes(category: nil, designer: nil, availability: nil, price_min: nil, price_max: nil)
+      rows = filtered_rows(category: category, designer: designer, availability: availability, sizes: [], price_min: price_min, price_max: price_max, sort_by: "featured")
+      rows.map { |row| row[:size].to_s.strip }.reject(&:blank?).uniq.sort_by { |value| value.to_i }
     end
 
     def find(identifier)
@@ -245,7 +250,7 @@ module Shopify
 
     private
 
-    def live_page(first:, after:, before:, category:, designer:)
+    def live_page(first:, after:, before:, category:, designer:, availability:, sizes:, price_min:, price_max:, sort_by:)
       if before.present?
         data = @client.query(query: PRODUCTS_PAGE_BACKWARD_QUERY, variables: { last: first, before: before })
       else
@@ -259,6 +264,13 @@ module Shopify
       product_cards = edges.map { |edge| to_product_card(edge["node"], truncate_description: true) }
       product_cards = filter_products_by_designer(product_cards, designer)
       product_cards = filter_products_by_category(product_cards, category)
+
+      price_min_amount = parse_amount(price_min)
+      price_max_amount = parse_amount(price_max)
+      product_cards = product_cards.select { |product| product.price_amount.to_f >= price_min_amount } if price_min_amount
+      product_cards = product_cards.select { |product| product.price_amount.to_f <= price_max_amount } if price_max_amount
+
+      product_cards = sort_products(product_cards, sort_by)
       page_info = products_data["pageInfo"] || {}
 
       ProductPage.new(
@@ -268,8 +280,8 @@ module Shopify
       )
     end
 
-    def fallback_page(first:, after:, before:, category:, designer:)
-      rows = filtered_rows(category: category, designer: designer)
+    def fallback_page(first:, after:, before:, category:, designer:, availability:, sizes:, price_min:, price_max:, sort_by:)
+      rows = filtered_rows(category: category, designer: designer, availability: availability, sizes: sizes, price_min: price_min, price_max: price_max, sort_by: sort_by)
       return ProductPage.new(products: [], next_cursor: nil, prev_cursor: nil) if rows.blank?
 
       per_page = [ [ first.to_i, 1 ].max, 24 ].min
@@ -326,7 +338,8 @@ module Shopify
         currency_code: currency,
         variant_id: node.dig("variants", "nodes", 0, "id"),
         category: normalize_category(node["productType"]),
-        designer: normalize_designer(node["vendor"])
+        designer: normalize_designer(node["vendor"]),
+        in_stock: true
       )
     end
 
@@ -363,19 +376,41 @@ module Shopify
         currency_code: row[:currency_code],
         variant_id: row[:variant_id],
         category: normalize_category(row[:category]),
-        designer: normalize_designer(row[:designer])
+        designer: normalize_designer(row[:designer]),
+        size: row[:size],
+        in_stock: row[:in_stock],
+        sales_rank: row[:sales_rank],
+        created_at: row[:created_at]
       )
     end
 
-    def filtered_rows(category:, designer:)
+    def filtered_rows(category:, designer:, availability:, sizes:, price_min:, price_max:, sort_by:)
       rows = fallback_rows
-      rows = rows.select { |row| normalize_designer(row[:designer]) == designer_filter(designer) } if designer_filter(designer).present?
+
+      designer_value = designer_filter(designer)
+      rows = rows.select { |row| normalize_designer(row[:designer]) == designer_value } if designer_value.present?
 
       category_filter_value = category_filter(category)
       return [] if category_filter_value == :invalid
-      return rows if category_filter_value.nil?
+      rows = rows.select { |row| normalize_category(row[:category]) == category_filter_value } if category_filter_value.present?
 
-      rows.select { |row| normalize_category(row[:category]) == category_filter_value }
+      case availability.to_s
+      when "in-stock"
+        rows = rows.select { |row| row[:in_stock] == true }
+      when "out-of-stock"
+        rows = rows.select { |row| row[:in_stock] == false }
+      end
+
+      normalized_sizes = Array(sizes).map(&:to_s).reject(&:blank?)
+      rows = rows.select { |row| normalized_sizes.include?(row[:size].to_s) } if normalized_sizes.present?
+
+      price_min_amount = parse_amount(price_min)
+      rows = rows.select { |row| row[:price_amount].to_f >= price_min_amount } if price_min_amount
+
+      price_max_amount = parse_amount(price_max)
+      rows = rows.select { |row| row[:price_amount].to_f <= price_max_amount } if price_max_amount
+
+      sort_rows(rows, sort_by)
     end
 
     def filter_products_by_category(products, category)
@@ -391,6 +426,61 @@ module Shopify
       return products if normalized.blank?
 
       products.select { |product| product.designer == normalized }
+    end
+
+    def sort_rows(rows, sort_by)
+      mode = canonical_sort(sort_by)
+
+      case mode
+      when "alpha-asc"
+        rows.sort_by { |row| row[:title].to_s.downcase }
+      when "alpha-desc"
+        rows.sort_by { |row| row[:title].to_s.downcase }.reverse
+      when "price-asc"
+        rows.sort_by { |row| row[:price_amount].to_f }
+      when "price-desc"
+        rows.sort_by { |row| row[:price_amount].to_f }.reverse
+      when "date-asc"
+        rows.sort_by { |row| row[:created_at] || Time.at(0) }
+      when "date-desc"
+        rows.sort_by { |row| row[:created_at] || Time.at(0) }.reverse
+      when "best-selling"
+        rows.sort_by { |row| row[:sales_rank].to_i.zero? ? 9_999 : row[:sales_rank].to_i }
+      else
+        rows
+      end
+    end
+
+    def sort_products(products, sort_by)
+      mode = canonical_sort(sort_by)
+
+      case mode
+      when "alpha-asc"
+        products.sort_by { |product| product.title.to_s.downcase }
+      when "alpha-desc"
+        products.sort_by { |product| product.title.to_s.downcase }.reverse
+      when "price-asc"
+        products.sort_by { |product| product.price_amount.to_f }
+      when "price-desc"
+        products.sort_by { |product| product.price_amount.to_f }.reverse
+      else
+        products
+      end
+    end
+
+    def canonical_sort(value)
+      raw = value.to_s
+      return "featured" if raw.blank?
+
+      raw
+    end
+
+    def parse_amount(value)
+      return nil if value.blank?
+
+      Float(value)
+    rescue ArgumentError, TypeError
+      nil
     end
 
     def category_filter(value)
@@ -446,7 +536,25 @@ module Shopify
     def normalize_fallback_row(row)
       normalized = row.to_h.transform_keys(&:to_sym)
       normalized[:price_amount] = normalized[:price_amount].to_f if normalized[:price_amount].present?
+      normalized[:size] = normalized[:size].to_s if normalized[:size].present?
+      normalized[:in_stock] = normalize_in_stock(normalized[:in_stock])
+      normalized[:sales_rank] = normalized[:sales_rank].to_i if normalized[:sales_rank].present?
+      normalized[:created_at] = parse_timestamp(normalized[:created_at])
       normalized
+    end
+
+    def normalize_in_stock(value)
+      return value if value == true || value == false
+
+      !value.to_s.strip.casecmp("false").zero?
+    end
+
+    def parse_timestamp(value)
+      return nil if value.blank?
+
+      Time.zone.parse(value.to_s)
+    rescue ArgumentError
+      nil
     end
 
     def money_label(amount:, currency:)

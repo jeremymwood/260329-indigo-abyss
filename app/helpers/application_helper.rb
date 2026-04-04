@@ -37,6 +37,25 @@ module ApplicationHelper
     product.price
   end
 
+  def facet_query_params(extra = {})
+    base = {
+      "availability" => params[:availability].presence,
+      "price_min" => params[:price_min].presence,
+      "price_max" => params[:price_max].presence,
+      "sort_by" => params[:sort_by].presence,
+      "per" => params[:per].presence,
+      "category" => params[:category].presence
+    }
+
+    sizes = Array(params[:sizes]).map(&:to_s).reject(&:blank?)
+    product_types = Array(params[:product_types]).map(&:to_s).reject(&:blank?)
+
+    base["sizes"] = sizes if sizes.present?
+    base["product_types"] = product_types if product_types.present?
+
+    base.merge(extra.stringify_keys).compact
+  end
+
   private
 
   def nav_section

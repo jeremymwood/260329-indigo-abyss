@@ -28,11 +28,11 @@
         <div class="facet-menu facet-price-grid">
           <label>
             From
-            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, value: @facet_price_min, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
           </label>
           <label>
             To
-            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, value: @facet_price_max, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
           </label>
         </div>
       </details>
@@ -93,25 +93,25 @@
     <nav class="pagination-nav" aria-label="Collection pagination">
       <% if @selected_category.present? %>
         <% if @catalog_page.prev_cursor.present? %>
-          <%= link_to "Previous", category_collection_path(@selected_category, before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+          <%= link_to "Previous", category_collection_path(@selected_category, facet_query_params(before: @catalog_page.prev_cursor, after: nil)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Previous</span>
         <% end %>
 
         <% if @catalog_page.next_cursor.present? %>
-          <%= link_to "Next", category_collection_path(@selected_category, after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+          <%= link_to "Next", category_collection_path(@selected_category, facet_query_params(after: @catalog_page.next_cursor, before: nil)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Next</span>
         <% end %>
       <% else %>
         <% if @catalog_page.prev_cursor.present? %>
-          <%= link_to "Previous", shop_path(before: @catalog_page.prev_cursor, per: params[:per]), class: "pagination-link" %>
+          <%= link_to "Previous", shop_path(facet_query_params(before: @catalog_page.prev_cursor, after: nil)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Previous</span>
         <% end %>
 
         <% if @catalog_page.next_cursor.present? %>
-          <%= link_to "Next", shop_path(after: @catalog_page.next_cursor, per: params[:per]), class: "pagination-link" %>
+          <%= link_to "Next", shop_path(facet_query_params(after: @catalog_page.next_cursor, before: nil)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Next</span>
         <% end %>

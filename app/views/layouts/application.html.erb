@@ -23,34 +23,58 @@
     <nav class="site-nav" aria-label="Primary">
       <div class="site-nav-inner">
         <div class="site-nav-top">
+          <button type="button" class="site-nav-hamburger" aria-expanded="false" aria-label="Toggle navigation menu">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            <span class="sr-only">Toggle menu</span>
+          </button>
           <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
+<div class="site-nav-menu">
+  <div class="site-nav-primary">
+    <form class="site-nav-search" action="<%= shop_path %>" method="get" role="search">
+      <label for="drawer-search" class="sr-only">Search products</label>
+      <input id="drawer-search" name="q" type="search" placeholder="Search denim...">
+      <button type="submit" aria-label="Search">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      </button>
+    </form>
 
-          <div class="site-nav-menu">
-            <%= link_to "New Arrivals", shop_path, class: "site-nav-link nav-hover-cyan" %>
+    <%= link_to "New Arrivals", shop_path, class: "site-nav-link nav-hover-cyan" %>
 
-            <div class="site-nav-dropdown">
-              <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan">Designers</button>
-              <div class="site-nav-panel">
-                <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
-                <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
-                <%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %>
-                <%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %>
-              </div>
-            </div>
+    <div class="site-nav-dropdown">
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Designers" aria-expanded="false">Designers</button>
+      <div class="site-nav-panel">
+        <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
+        <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
+        <%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %>
+        <%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %>
+      </div>
+    </div>
 
-            <div class="site-nav-dropdown">
-              <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan">Categories</button>
-              <div class="site-nav-panel">
-                <%= link_to "Pants", category_collection_path("pants") %>
-                <%= link_to "Shirts", category_collection_path("shirts") %>
-                <%= link_to "Jackets", category_collection_path("jackets") %>
-                <%= link_to "Accessories", category_collection_path("accessories") %>
-              </div>
-            </div>
+    <div class="site-nav-dropdown">
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Categories" aria-expanded="false">Categories</button>
+      <div class="site-nav-panel">
+        <%= link_to "Pants", category_collection_path("pants") %>
+        <%= link_to "Shirts", category_collection_path("shirts") %>
+        <%= link_to "Jackets", category_collection_path("jackets") %>
+        <%= link_to "Accessories", category_collection_path("accessories") %>
+      </div>
+    </div>
 
-            <%= link_to "Gift Card", root_path, class: "site-nav-link nav-hover-cyan" %>
-            <%= link_to "Sale", shop_path, class: "site-nav-link sale-link" %>
-          </div>
+    <%= link_to "Sale", shop_path, class: "site-nav-link sale-link" %>
+    <%= link_to "Login", root_path, class: "site-nav-login-button" %>
+  </div>
+
+  <div class="site-nav-subpanel" aria-hidden="true">
+    <div class="site-nav-subpanel-header">
+      <button type="button" class="site-nav-subpanel-back" aria-label="Back to main menu">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <h2 class="site-nav-subpanel-title"></h2>
+    </div>
+    <div class="site-nav-subpanel-links"></div>
+  </div>
+</div>
+
 
           <div class="site-nav-utilities" aria-label="Utility links">
             <%= link_to shop_path, class: "#{utility_link_class(:shop)} icon-link", aria: { label: "Search" }, title: "Search" do %>
@@ -135,5 +159,162 @@
         </div>
       </div>
     </footer>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var navTop = document.querySelector(".site-nav-top");
+    var navHamburger = document.querySelector(".site-nav-hamburger");
+    var navIcon = navHamburger ? navHamburger.querySelector("i") : null;
+    var subpanel = navTop ? navTop.querySelector(".site-nav-subpanel") : null;
+    var subpanelTitle = navTop ? navTop.querySelector(".site-nav-subpanel-title") : null;
+    var subpanelLinks = navTop ? navTop.querySelector(".site-nav-subpanel-links") : null;
+    var subpanelBack = navTop ? navTop.querySelector(".site-nav-subpanel-back") : null;
+
+    var isMobileDrawer = function () {
+      return window.innerWidth <= 1120;
+    };
+
+    var applyScrollbarComp = function (isOpen) {
+      if (!isOpen) {
+        document.documentElement.style.removeProperty("--scrollbar-comp");
+        return;
+      }
+
+      var width = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty("--scrollbar-comp", width > 0 ? width + "px" : "0px");
+    };
+
+    var resetSubpanel = function () {
+      if (!navTop || !subpanel) return;
+
+      navTop.classList.remove("subpanel-open");
+      subpanel.setAttribute("aria-hidden", "true");
+      if (subpanelTitle) subpanelTitle.textContent = "";
+      if (subpanelLinks) subpanelLinks.innerHTML = "";
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    };
+
+    var setNavState = function (isOpen) {
+      if (!navTop || !navHamburger) return;
+
+      navTop.classList.toggle("nav-menu-open", isOpen);
+      document.body.classList.toggle("nav-drawer-open", isOpen);
+      navHamburger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      navHamburger.classList.toggle("is-open", isOpen);
+
+      if (navIcon) {
+        navIcon.classList.toggle("fa-bars", !isOpen);
+        navIcon.classList.toggle("fa-xmark", isOpen);
+      }
+
+      applyScrollbarComp(isOpen);
+      if (!isOpen) resetSubpanel();
+    };
+
+    var openSubpanel = function (toggle) {
+      if (!isMobileDrawer() || !subpanel || !subpanelLinks || !subpanelTitle) return;
+
+      var dropdown = toggle.closest(".site-nav-dropdown");
+      var links = dropdown ? Array.from(dropdown.querySelectorAll(".site-nav-panel a")) : [];
+      if (links.length === 0) return;
+
+      subpanelTitle.textContent = toggle.dataset.drawerLabel || toggle.textContent.trim();
+      subpanelLinks.innerHTML = "";
+
+      links.forEach(function (link) {
+        var clone = link.cloneNode(true);
+        clone.addEventListener("click", function () {
+          setNavState(false);
+        });
+        subpanelLinks.appendChild(clone);
+      });
+
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (btn) {
+        btn.setAttribute("aria-expanded", btn === toggle ? "true" : "false");
+      });
+
+      navTop.classList.add("subpanel-open");
+      subpanel.setAttribute("aria-hidden", "false");
+    };
+
+    if (navTop && navHamburger) {
+      navHamburger.addEventListener("click", function () {
+        setNavState(!navTop.classList.contains("nav-menu-open"));
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!navTop.contains(event.target)) setNavState(false);
+      });
+
+      navTop.querySelectorAll(".site-nav-link, .site-nav-login-button").forEach(function (link) {
+        link.addEventListener("click", function () {
+          setNavState(false);
+        });
+      });
+
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (toggle) {
+        toggle.addEventListener("click", function (event) {
+          if (!isMobileDrawer()) return;
+
+          event.preventDefault();
+          openSubpanel(toggle);
+        });
+      });
+
+      if (subpanelBack) {
+        subpanelBack.addEventListener("click", function () {
+          resetSubpanel();
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          if (navTop.classList.contains("subpanel-open")) {
+            resetSubpanel();
+          } else {
+            setNavState(false);
+          }
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 1120) setNavState(false);
+      });
+    }
+
+    document.querySelectorAll(".facet-pills-form").forEach(function (form) {
+      var pills = Array.from(form.querySelectorAll("details.facet-pill"));
+      if (pills.length === 0) return;
+
+      var closeAll = function (exceptPill) {
+        pills.forEach(function (pill) {
+          if (pill !== exceptPill) pill.open = false;
+        });
+      };
+
+      pills.forEach(function (pill) {
+        pill.addEventListener("toggle", function () {
+          if (pill.open) closeAll(pill);
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!form.contains(event.target)) closeAll(null);
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeAll(null);
+      });
+
+      form.querySelectorAll("select, input[type='checkbox'], input[type='number']").forEach(function (control) {
+        control.addEventListener("change", function () {
+          closeAll(null);
+        });
+      });
+    });
+  });
+</script>
+
 </body>
 </html>

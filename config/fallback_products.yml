@@ -11,6 +11,10 @@
   category: pants
   designer: oni-denim
   secondary_image_url: "/images/products/1024x1024-Mens-Jackets-SelvedgeDenimTrucker-RawIndigo-091423-1_1024x1024.webp"
+  size: '28'
+  in_stock: false
+  sales_rank: 1
+  created_at: '2025-01-01T00:00:00Z'
 - id: sample-002
   handle: nocturne-taper-13oz
   title: Nocturne Taper 13oz
@@ -23,6 +27,10 @@
   category: pants
   designer: oni-denim
   secondary_image_url: "/images/products/American-Tall-Men-Fitted-Denim-Western-Shirt-Heritage-Faded-Front.jpg"
+  size: '29'
+  in_stock: true
+  sales_rank: 2
+  created_at: '2025-01-02T00:00:00Z'
 - id: sample-003
   handle: rinse-black-warp-12oz
   title: Rinse Black Warp 12oz
@@ -35,6 +43,10 @@
   category: jackets
   designer: oni-denim
   secondary_image_url: "/images/products/DSC_0003.webp"
+  size: '30'
+  in_stock: true
+  sales_rank: 3
+  created_at: '2025-01-03T00:00:00Z'
 - id: sample-004
   handle: railcar-straight-15oz
   title: Railcar Straight 15oz
@@ -47,6 +59,10 @@
   category: pants
   designer: iron-heart
   secondary_image_url: "/images/products/Iron_Heart_Modified_Type_III_Denim_Jacket_14oz_Indigo-001-680x1025.jpg"
+  size: '31'
+  in_stock: true
+  sales_rank: 4
+  created_at: '2025-01-04T00:00:00Z'
 - id: sample-005
   handle: harbor-relaxed-13oz
   title: Harbor Relaxed 13oz
@@ -59,6 +75,10 @@
   category: pants
   designer: iron-heart
   secondary_image_url: "/images/products/Iron_Heart_Slubby_Selvedge_Type_III_Denim_Jacket_IH-526J_SLB-001-680x1025.jpg"
+  size: '32'
+  in_stock: true
+  sales_rank: 5
+  created_at: '2025-01-05T00:00:00Z'
 - id: sample-006
   handle: arc-taper-14oz
   title: Arc Taper 14oz
@@ -71,6 +91,10 @@
   category: pants
   designer: iron-heart
   secondary_image_url: "/images/products/RRLSS18004_b.jpg"
+  size: '33'
+  in_stock: false
+  sales_rank: 6
+  created_at: '2025-01-06T00:00:00Z'
 - id: sample-007
   handle: midnight-slim-12oz
   title: Midnight Slim 12oz
@@ -83,6 +107,10 @@
   category: shirts
   designer: samurai-jeans
   secondary_image_url: "/images/products/SHOT_27_062_832b82e2-6fce-4cfe-8045-ef191a247573.webp"
+  size: '34'
+  in_stock: true
+  sales_rank: 7
+  created_at: '2025-01-07T00:00:00Z'
 - id: sample-008
   handle: foundry-wide-16oz
   title: Foundry Wide 16oz
@@ -95,6 +123,10 @@
   category: pants
   designer: samurai-jeans
   secondary_image_url: "/images/products/blue_1080x.webp"
+  size: '36'
+  in_stock: true
+  sales_rank: 8
+  created_at: '2025-01-08T00:00:00Z'
 - id: sample-009
   handle: low-tide-crop-11oz
   title: Low Tide Crop 11oz
@@ -107,6 +139,10 @@
   category: accessories
   designer: samurai-jeans
   secondary_image_url: "/images/products/il_fullxfull.6249539584_pi8j.avif"
+  size: '38'
+  in_stock: true
+  sales_rank: 9
+  created_at: '2025-01-09T00:00:00Z'
 - id: sample-010
   handle: ridge-regular-13oz
   title: Ridge Regular 13oz
@@ -119,6 +155,10 @@
   category: shirts
   designer: samurai-jeans
   secondary_image_url: "/images/products/image_6f92f214-5012-4c9b-898f-e84c290bdcfe_1800x.webp"
+  size: '40'
+  in_stock: true
+  sales_rank: 10
+  created_at: '2025-01-10T00:00:00Z'
 - id: sample-011
   handle: polar-selvedge-15oz
   title: Polar Selvedge 15oz
@@ -131,6 +171,10 @@
   category: jackets
   designer: studio-dartisan
   secondary_image_url: "/images/products/rdnw08-indigo-3S.webp"
+  size: '28'
+  in_stock: false
+  sales_rank: 11
+  created_at: '2025-01-11T00:00:00Z'
 - id: sample-012
   handle: furnace-taper-14oz
   title: Furnace Taper 14oz
@@ -143,6 +187,10 @@
   category: jackets
   designer: studio-dartisan
   secondary_image_url: "/images/products/redline-selvedge-japanese-denim-tote-4685100.webp"
+  size: '29'
+  in_stock: true
+  sales_rank: 12
+  created_at: '2025-01-12T00:00:00Z'
 - id: sample-013
   handle: harbor-slim-straight-12oz
   title: Harbor Slim Straight 12oz
@@ -155,6 +203,10 @@
   category: pants
   designer: studio-dartisan
   secondary_image_url: "/images/products/rgdenim_20oz_okayama_selvedge_straight_jeans_front_38621812-5a0a-44e3-90a1-ea6fb0856f4d.webp"
+  size: '30'
+  in_stock: true
+  sales_rank: 13
+  created_at: '2025-01-13T00:00:00Z'
 - id: sample-014
   handle: forge-relaxed-taper-15oz
   title: Forge Relaxed Taper 15oz
@@ -167,6 +219,10 @@
   category: jackets
   designer: studio-dartisan
   secondary_image_url: "/images/products/rgdenim_new20oz_selvedge_straight_jeans_model.webp"
+  size: '31'
+  in_stock: true
+  sales_rank: 14
+  created_at: '2025-01-14T00:00:00Z'
 - id: sample-015
   handle: shadow-crop-taper-11oz
   title: Shadow Crop Taper 11oz
@@ -179,6 +235,10 @@
   category: accessories
   designer: oni-denim
   secondary_image_url: "/images/products/s-l1200.jpg"
+  size: '32'
+  in_stock: true
+  sales_rank: 15
+  created_at: '2025-01-15T00:00:00Z'
 - id: sample-016
   handle: kiln-regular-14oz
   title: Kiln Regular 14oz
@@ -191,6 +251,10 @@
   category: shirts
   designer: iron-heart
   secondary_image_url: "/images/products/the-flat-head-10oz-selvedge-denim-work-shirt-fit.webp"
+  size: '33'
+  in_stock: false
+  sales_rank: 16
+  created_at: '2025-01-16T00:00:00Z'
 - id: sample-017
   handle: cobalt-wide-leg-13oz
   title: Cobalt Wide Leg 13oz
@@ -203,6 +267,10 @@
   category: pants
   designer: samurai-jeans
   secondary_image_url: "/images/products/1024x1024-Men-ChambrayWorkshirt-VintageIndigo-091925-3.webp"
+  size: '34'
+  in_stock: true
+  sales_rank: 17
+  created_at: '2025-01-17T00:00:00Z'
 - id: sample-018
   handle: vapor-skinny-10oz
   title: Vapor Skinny 10oz
@@ -215,6 +283,10 @@
   category: shirts
   designer: studio-dartisan
   secondary_image_url: "/images/products/1024x1024-Mens-Jackets-SelvedgeDenimTrucker-RawIndigo-091423-1_1024x1024.webp"
+  size: '36'
+  in_stock: true
+  sales_rank: 18
+  created_at: '2025-01-18T00:00:00Z'
 - id: sample-019
   handle: anvil-straight-15oz
   title: Anvil Straight 15oz
@@ -227,6 +299,10 @@
   category: jackets
   designer: oni-denim
   secondary_image_url: "/images/products/American-Tall-Men-Fitted-Denim-Western-Shirt-Heritage-Faded-Front.jpg"
+  size: '38'
+  in_stock: true
+  sales_rank: 19
+  created_at: '2025-01-19T00:00:00Z'
 - id: sample-020
   handle: atlas-relaxed-straight-14oz
   title: Atlas Relaxed Straight 14oz
@@ -239,3 +315,7 @@
   category: accessories
   designer: iron-heart
   secondary_image_url: "/images/products/DSC_0003.webp"
+  size: '40'
+  in_stock: true
+  sales_rank: 20
+  created_at: '2025-01-20T00:00:00Z'

@@ -47,15 +47,21 @@ class StorefrontController < ApplicationController
     @selected_category = selected_category_from_params
     @shopify_connected = client.configured?
 
+    set_facet_state(catalog: catalog, selected_category: @selected_category, designer: @designer_slug)
+
     @catalog_page = catalog.page(
       first: per_page,
       after: params[:after],
       before: params[:before],
       category: @selected_category,
-      designer: @designer_slug
+      designer: @designer_slug,
+      availability: @facet_availability,
+      sizes: @facet_selected_sizes,
+      price_min: @facet_price_min,
+      price_max: @facet_price_max,
+      sort_by: @facet_sort_by
     )
 
-    set_facet_state(max_price: catalog.max_price(category: @selected_category, designer: @designer_slug))
     set_storefront_notice(client)
   end
 
@@ -79,23 +85,48 @@ class StorefrontController < ApplicationController
     @shopify_connected = client.configured?
     @categories = Shopify::ProductCatalog::SUPPORTED_CATEGORIES
     @selected_category = selected_category.to_s.presence
+
+    set_facet_state(catalog: catalog, selected_category: @selected_category)
+
     @catalog_page = catalog.page(
       first: per_page,
       after: params[:after],
       before: params[:before],
-      category: @selected_category
+      category: @selected_category,
+      availability: @facet_availability,
+      sizes: @facet_selected_sizes,
+      price_min: @facet_price_min,
+      price_max: @facet_price_max,
+      sort_by: @facet_sort_by
     )
 
-    set_facet_state(max_price: catalog.max_price(category: @selected_category))
     set_storefront_notice(client)
   end
 
-  def set_facet_state(max_price:)
-    @facet_max_price = max_price
-    @facet_sizes = SIZE_OPTIONS
-    @facet_selected_sizes = Array(params[:sizes]).map(&:to_s)
+  def set_facet_state(catalog:, selected_category:, designer: nil)
+    @facet_price_min = parse_amount(params[:price_min])
+    @facet_price_max = parse_amount(params[:price_max])
+    @facet_selected_sizes = Array(params[:sizes]).map(&:to_s).reject(&:blank?)
     @facet_availability = params[:availability].to_s.presence
     @facet_sort_by = params[:sort_by].to_s.presence || "featured"
+
+    @facet_max_price = catalog.max_price(
+      category: selected_category,
+      designer: designer,
+      availability: @facet_availability,
+      sizes: @facet_selected_sizes,
+      price_min: @facet_price_min,
+      price_max: @facet_price_max
+    )
+
+    @facet_sizes = catalog.available_sizes(
+      category: selected_category,
+      designer: designer,
+      availability: @facet_availability,
+      price_min: @facet_price_min,
+      price_max: @facet_price_max
+    )
+    @facet_sizes = SIZE_OPTIONS if @facet_sizes.blank?
   end
 
   def selected_category_from_params
@@ -103,6 +134,14 @@ class StorefrontController < ApplicationController
     return explicit if explicit.present?
 
     Array(params[:product_types]).map(&:to_s).find(&:present?)
+  end
+
+  def parse_amount(value)
+    return nil if value.blank?
+
+    Float(value)
+  rescue ArgumentError, TypeError
+    nil
   end
 
   def per_page

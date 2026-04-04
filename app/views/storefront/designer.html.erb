@@ -28,11 +28,11 @@
         <div class="facet-menu facet-price-grid">
           <label>
             From
-            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_min, min: 0, step: 1, value: @facet_price_min, placeholder: 0, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
           </label>
           <label>
             To
-            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
+            <span class="facet-money-input"><span>$</span><%= form.number_field :price_max, min: 0, step: 1, value: @facet_price_max, placeholder: @facet_max_price.to_i, class: "facet-input", onchange: "this.form.requestSubmit()" %></span>
           </label>
         </div>
       </details>
@@ -92,13 +92,13 @@
 
       <nav class="pagination-nav" aria-label="Collection pagination">
         <% if @catalog_page.prev_cursor.present? %>
-          <%= link_to "Previous", designer_collection_path(@designer_slug, before: @catalog_page.prev_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
+          <%= link_to "Previous", designer_collection_path(@designer_slug, facet_query_params(before: @catalog_page.prev_cursor, after: nil, category: @selected_category)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Previous</span>
         <% end %>
 
         <% if @catalog_page.next_cursor.present? %>
-          <%= link_to "Next", designer_collection_path(@designer_slug, after: @catalog_page.next_cursor, per: params[:per], category: @selected_category), class: "pagination-link" %>
+          <%= link_to "Next", designer_collection_path(@designer_slug, facet_query_params(after: @catalog_page.next_cursor, before: nil, category: @selected_category)), class: "pagination-link" %>
         <% else %>
           <span class="pagination-link disabled" aria-disabled="true">Next</span>
         <% end %>
