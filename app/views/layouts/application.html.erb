@@ -41,7 +41,7 @@
     <%= link_to "New Arrivals", shop_path, class: "site-nav-link nav-hover-cyan" %>
 
     <div class="site-nav-dropdown">
-      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Designers" aria-expanded="false">Designers</button>
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Designers" aria-expanded="false"><span>Designers</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
       <div class="site-nav-panel">
         <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
         <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
@@ -51,7 +51,7 @@
     </div>
 
     <div class="site-nav-dropdown">
-      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Categories" aria-expanded="false">Categories</button>
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Categories" aria-expanded="false"><span>Categories</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
       <div class="site-nav-panel">
         <%= link_to "Pants", category_collection_path("pants") %>
         <%= link_to "Shirts", category_collection_path("shirts") %>
@@ -173,14 +173,17 @@
       return window.innerWidth <= 1120;
     };
 
-    var applyScrollbarComp = function (isOpen) {
-      if (!isOpen) {
-        document.documentElement.style.removeProperty("--scrollbar-comp");
-        return;
-      }
-
+    var measureScrollbarComp = function () {
       var width = window.innerWidth - document.documentElement.clientWidth;
-      document.documentElement.style.setProperty("--scrollbar-comp", width > 0 ? width + "px" : "0px");
+      return width > 0 ? width : 0;
+    };
+
+    var applyScrollbarComp = function (width) {
+      document.documentElement.style.setProperty("--scrollbar-comp", width + "px");
+    };
+
+    var clearScrollbarComp = function () {
+      document.documentElement.style.removeProperty("--scrollbar-comp");
     };
 
     var resetSubpanel = function () {
@@ -198,6 +201,10 @@
     var setNavState = function (isOpen) {
       if (!navTop || !navHamburger) return;
 
+      if (isOpen) {
+        applyScrollbarComp(measureScrollbarComp());
+      }
+
       navTop.classList.toggle("nav-menu-open", isOpen);
       document.body.classList.toggle("nav-drawer-open", isOpen);
       navHamburger.setAttribute("aria-expanded", isOpen ? "true" : "false");
@@ -208,8 +215,10 @@
         navIcon.classList.toggle("fa-xmark", isOpen);
       }
 
-      applyScrollbarComp(isOpen);
-      if (!isOpen) resetSubpanel();
+      if (!isOpen) {
+        resetSubpanel();
+        clearScrollbarComp();
+      }
     };
 
     var openSubpanel = function (toggle) {

@@ -21,9 +21,6 @@ body {
 
 body.nav-drawer-open {
   overflow: hidden;
-}
-
-body.nav-drawer-open .site-nav {
   padding-right: var(--scrollbar-comp, 0px);
 }
 
@@ -812,7 +809,7 @@ body.nav-drawer-open .site-nav {
     width: 100%;
     text-align: left;
     padding: 0.65rem 0.3rem;
-    font-size: 1.72rem;
+    font-size: 1.5rem;
     letter-spacing: 0.02em;
   }
 
@@ -822,10 +819,8 @@ body.nav-drawer-open .site-nav {
     align-items: center;
   }
 
-  .drawer-parent-link::after {
-    content: ">";
-    font-size: 1.6rem;
-    line-height: 1;
+  .drawer-parent-link i {
+    font-size: 1.1rem;
     color: #4b5563;
   }
 
