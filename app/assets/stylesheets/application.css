@@ -217,7 +217,19 @@ body {
 .site-shell {
   max-width: 1350px;
   margin: 0 auto;
-  padding: 0 1.2rem 4rem;
+  padding: 0 1.2rem;
+}
+
+.pagination-shell {
+  min-height: calc(100vh - 260px);
+  display: flex;
+  flex-direction: column;
+}
+
+.pagination-shell .collection-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .hero,
@@ -468,7 +480,12 @@ body {
 }
 
 .pagination-nav {
+  margin-top: 1.2rem;
+}
+
+.pagination-shell .pagination-nav {
   margin-top: auto;
+  padding-top: 1.2rem;
 }
 
 .pagination-link {
@@ -657,15 +674,8 @@ body {
   }
 }
 
-
-
-
-
-
-
-
 .site-footer {
-  margin-top: 3rem;
+  margin-top: 1rem;
   border-top: 1px solid var(--line);
   background: #fafafa;
 }
@@ -673,10 +683,7 @@ body {
 .site-footer-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem 1.2rem 1.4rem;
-}
-
-.footer-signup {
+  padding: 1rem;
 }
 
 .footer-signup h3 {
@@ -721,7 +728,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
-  padding: 1.2rem 0;
+  padding: 0 0 1.2rem 0;
 }
 
 .footer-grid h3 {
