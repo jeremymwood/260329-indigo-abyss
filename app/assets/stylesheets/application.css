@@ -270,6 +270,7 @@ body {
 .facet-pills-form {
   display: flex;
   gap: 0.6rem;
+  margin: 1rem 0 1.2rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -285,7 +286,7 @@ body {
   list-style: none;
   cursor: pointer;
   padding: 0.42rem 0.78rem;
-  font-size: 0.86rem;
+  font-size: 0.75rem;
 }
 
 .facet-pill summary::-webkit-details-marker {
@@ -312,6 +313,7 @@ body {
   color: #111827;
   padding: 0.46rem 0.62rem;
   font: inherit;
+  font-size: 0.75rem;
 }
 
 .facet-checklist {
@@ -466,7 +468,7 @@ body {
 }
 
 .pagination-nav {
-  margin-top: 1.2rem;
+  margin-top: auto;
 }
 
 .pagination-link {
