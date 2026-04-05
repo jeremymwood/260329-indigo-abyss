@@ -146,7 +146,9 @@ body.nav-drawer-open {
   color: var(--text);
   text-decoration: none;
   font-size: 0.86rem;
-  letter-spacing: 0.045em;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 100;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
   padding: 0.34rem 0.46rem;
   border: none;
@@ -815,7 +817,8 @@ body.nav-drawer-open {
     text-align: left;
     padding: 0.65rem 0.3rem;
     font-size: 1.5rem;
-    letter-spacing: 0.02em;
+    font-weight: 200;
+    letter-spacing: 0.015em;
   }
 
   .drawer-parent-link {
@@ -1038,14 +1041,19 @@ body.nav-drawer-open {
 }
 
 .collection-hero-carousel {
-  padding-bottom: 1rem;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding: 0;
 }
 
 .hero-carousel {
   position: relative;
-  margin-top: 0.6rem;
+  margin-top: 0;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 5;
   overflow: hidden;
   background: #f3f4f6;
 }
@@ -1081,7 +1089,7 @@ body.nav-drawer-open {
 .hero-slide-overlay {
   position: absolute;
   left: 50%;
-  bottom: 1.25rem;
+  bottom: 0.25rem;
   transform: translateX(-50%);
   text-align: center;
   padding: 0.55rem 0.9rem;
@@ -1090,31 +1098,29 @@ body.nav-drawer-open {
 
 .hero-slide-designer,
 .hero-slide-title,
-.hero-slide-price {
+.hero-slide-subtitle {
   color: white;
   margin: 0;
 }
-.hero-slide-designer:hover,
-.hero-slide-title:hover,
-.hero-slide-price:hover {
+.hero-slide-overlay:hover .hero-slide-designer,
+.hero-slide-overlay:hover .hero-slide-title,
+.hero-slide-overlay:hover .hero-slide-subtitle {
   color: rgb(164, 164, 164);
 }
-
 .hero-slide-designer {
-  font-size: 0.82rem;
+  font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.hero-slide-title {
+.hero-slide-title,
+.hero-slide-subtitle {
+  font-size: 1rem;
   margin-top: 0.2rem;
-  font-size: 1.05rem;
 }
 
-.hero-slide-price {
-  margin-top: 0.2rem;
-  font-size: 1rem;
-  font-weight: 700;
+.hero-slide-subtitle {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
 }
 
 .hero-carousel-controls {

@@ -2,6 +2,7 @@
 
 <main class="site-shell">
   <section class="collection-hero collection-hero-carousel" aria-label="Collection overview">
+    <h1 class="sr-only">Indigo Abyss</h1>
     <% if @products.present? %>
       <div class="hero-carousel" data-interval="5000" aria-label="Featured carousel">
         <% @products.each_with_index do |product, index| %>
@@ -11,7 +12,7 @@
               <div class="hero-slide-overlay">
                 <p class="hero-slide-designer"><%= product_designer_label(product) %></p>
                 <p class="hero-slide-title"><%= product.title %></p>
-                <p class="hero-slide-price"><%= product_card_price(product) %></p>
+                <p class="hero-slide-subtitle">Available Now</p>
               </div>
             <% end %>
           </article>
