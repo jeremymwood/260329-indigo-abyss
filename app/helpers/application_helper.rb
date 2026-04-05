@@ -44,7 +44,8 @@ module ApplicationHelper
       "price_max" => params[:price_max].presence,
       "sort_by" => params[:sort_by].presence,
       "per" => params[:per].presence,
-      "category" => params[:category].presence
+      "category" => params[:category].presence,
+      "view" => params[:view].presence
     }
 
     sizes = Array(params[:sizes]).map(&:to_s).reject(&:blank?)

@@ -1,8 +1,14 @@
-<% content_for :title, @selected_category.present? ? "Shop #{@selected_category.to_s.tr("-", " ").titleize} | Indigo Abyss" : "Shop | Indigo Abyss" %>
+<% page_label = if @selected_category.present?
+                  @selected_category.to_s.tr("-", " ").titleize
+                elsif params[:view].to_s == "new-arrivals"
+                  "New Arrivals"
+                end %>
+<% title_prefix = page_label.present? ? "Shop #{page_label}" : "Shop" %>
+<% content_for :title, "#{title_prefix} | Indigo Abyss" %>
 
 <main class="site-shell pagination-shell">
   <section class="collection-hero" aria-label="Collection overview">
-    <h1>Shop<%= @selected_category.present? ? " #{@selected_category.to_s.tr("-", " ").titleize}" : "" %></h1>
+    <h1><%= title_prefix %></h1>
     <p class="lead">Explore the full Indigo Abyss catalog with smooth, cursor-based pagination designed for speed and precision, letting you seamlessly browse premium denim collections as new pieces load effortlessly with each scroll.</p>
   </section>
 
@@ -10,6 +16,9 @@
     <%= form_with url: shop_path, method: :get, local: true, class: "facet-pills-form" do |form| %>
       <% if params[:per].present? %>
         <%= form.hidden_field :per, value: params[:per] %>
+      <% end %>
+      <% if params[:view].present? %>
+        <%= form.hidden_field :view, value: params[:view] %>
       <% end %>
 
       <details class="facet-pill">
@@ -119,3 +128,7 @@
     </nav>
   <% end %>
 </main>
+
+
+
+

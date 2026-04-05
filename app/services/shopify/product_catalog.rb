@@ -27,7 +27,7 @@ module Shopify
               url
               altText
             }
-            images(first: 2) {
+            images(first: 4) {
               nodes {
                 url
                 altText
@@ -65,7 +65,7 @@ module Shopify
                 url
                 altText
               }
-              images(first: 2) {
+              images(first: 4) {
                 nodes {
                   url
                   altText
@@ -108,7 +108,7 @@ module Shopify
                 url
                 altText
               }
-              images(first: 2) {
+              images(first: 4) {
                 nodes {
                   url
                   altText
@@ -148,7 +148,7 @@ module Shopify
               url
               altText
             }
-            images(first: 2) {
+            images(first: 4) {
               nodes {
                 url
                 altText
@@ -183,7 +183,7 @@ module Shopify
               url
               altText
             }
-            images(first: 2) {
+            images(first: 4) {
               nodes {
                 url
                 altText
@@ -332,7 +332,9 @@ module Shopify
         title: node["title"],
         description: truncate_description ? truncate(node["description"]) : detail_copy(node["description"]),
         image_url: primary_image_url(node),
+        primary_image_url: primary_image_url(node),
         secondary_image_url: secondary_image_url(node),
+        image_urls: image_urls(node),
         price: money_label(amount: amount, currency: currency),
         price_amount: amount,
         currency_code: currency,
@@ -342,16 +344,23 @@ module Shopify
         in_stock: true
       )
     end
+def image_urls(node)
+  featured = node.dig("featuredImage", "url")
+  from_images = Array(node.dig("images", "nodes")).map { |img| img["url"] }.compact
+  urls = [ featured, *from_images ].compact.uniq
+  urls = [ fallback_image ] if urls.blank?
+  urls.first(4)
+end
 
-    def primary_image_url(node)
-      node.dig("featuredImage", "url") || node.dig("images", "nodes", 0, "url") || fallback_image
-    end
+def primary_image_url(node)
+  image_urls(node).first
+end
 
-    def secondary_image_url(node)
-      node.dig("images", "nodes", 1, "url") || node.dig("images", "nodes", 0, "url") || primary_image_url(node)
-    end
+def secondary_image_url(node)
+  image_urls(node)[1] || primary_image_url(node)
+end
 
-    def fallback_product(identifier)
+def fallback_product(identifier)
       decoded_identifier = CGI.unescape(identifier.to_s)
       row = fallback_rows.find { |item| item[:id] == decoded_identifier || item[:handle] == decoded_identifier }
       return nil if row.blank?
@@ -370,7 +379,9 @@ module Shopify
         title: row[:title],
         description: truncate_description ? truncate(row[:description]) : detail_copy(row[:description]),
         image_url: row[:image_url],
+        primary_image_url: row[:primary_image_url] || row[:image_url],
         secondary_image_url: row[:secondary_image_url] || row[:image_url],
+        image_urls: row[:image_urls],
         price: row[:price],
         price_amount: row[:price_amount],
         currency_code: row[:currency_code],
@@ -539,8 +550,19 @@ module Shopify
       normalized[:size] = normalized[:size].to_s if normalized[:size].present?
       normalized[:in_stock] = normalize_in_stock(normalized[:in_stock])
       normalized[:sales_rank] = normalized[:sales_rank].to_i if normalized[:sales_rank].present?
-      normalized[:created_at] = parse_timestamp(normalized[:created_at])
-      normalized
+normalized[:created_at] = parse_timestamp(normalized[:created_at])
+
+normalized[:primary_image_url] = normalized[:primary_image_url].presence || normalized[:image_url]
+normalized[:image_url] = normalized[:primary_image_url]
+normalized[:secondary_image_url] = normalized[:secondary_image_url].presence || normalized[:primary_image_url]
+
+image_urls = Array(normalized[:image_urls]).map { |value| value.to_s.strip }.reject(&:blank?)
+image_urls.unshift(normalized[:secondary_image_url]) if normalized[:secondary_image_url].present?
+image_urls.unshift(normalized[:primary_image_url]) if normalized[:primary_image_url].present?
+normalized[:image_urls] = image_urls.uniq.first(4)
+normalized[:secondary_image_url] = normalized[:image_urls][1] || normalized[:primary_image_url]
+
+normalized
     end
 
     def normalize_in_stock(value)

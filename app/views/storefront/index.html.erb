@@ -8,7 +8,15 @@
         <% @products.each_with_index do |product, index| %>
           <article class="hero-slide <%= "is-active" if index.zero? %>">
             <%= link_to product_path(product.handle || product.id), class: "hero-slide-link", aria: { label: "View #{product.title}" } do %>
-              <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+              <% hero_images = product.image_urls.first(3) %>
+              <% while hero_images.length < 3 %>
+                <% hero_images << product.primary_image_url %>
+              <% end %>
+              <div class="hero-slide-strip" aria-hidden="true">
+                <% hero_images.each_with_index do |image_url, image_index| %>
+                  <img src="<%= image_url %>" alt="<%= "#{product.title} photo #{image_index + 1}" %>" loading="lazy">
+                <% end %>
+              </div>
               <div class="hero-slide-overlay">
                 <p class="hero-slide-designer"><%= product_designer_label(product) %></p>
                 <p class="hero-slide-title"><%= product.title %></p>
