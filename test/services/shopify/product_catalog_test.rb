@@ -31,6 +31,7 @@ module Shopify
       assert_equal "Abyss Selvedge 14oz", products.first.title
       assert_equal "gid://shopify/ProductVariant/401001", products.first.variant_id
       assert_equal "USD 168.00", products.first.price
+      assert_not_equal products.first.image_url, products.first.secondary_image_url
     end
 
     test "find returns fallback product by handle" do
@@ -53,7 +54,14 @@ module Shopify
               "title" => "Edge Selvedge",
               "description" => "Live storefront denim card",
               "productType" => "pants",
+              "vendor" => "Oni Denim",
               "featuredImage" => { "url" => "https://cdn.example.com/edge.jpg" },
+              "images" => {
+                "nodes" => [
+                  { "url" => "https://cdn.example.com/edge.jpg" },
+                  { "url" => "https://cdn.example.com/edge-alt.jpg" }
+                ]
+              },
               "priceRange" => {
                 "minVariantPrice" => {
                   "amount" => "199.0",
@@ -75,6 +83,8 @@ module Shopify
       assert_equal "USD 199.00", product.price
       assert_equal "gid://shopify/ProductVariant/9001", product.variant_id
       assert_equal "pants", product.category
+      assert_equal "oni-denim", product.designer
+      assert_equal "https://cdn.example.com/edge-alt.jpg", product.secondary_image_url
     end
 
     test "featured falls back when live storefront data is missing" do
@@ -94,6 +104,19 @@ module Shopify
       assert_equal 20, products.length
       assert_equal "pants", products.first.category
       assert_equal "accessories", products.last.category
+    end
+
+    test "fallback fixture includes supported designers" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      products = catalog.featured(limit: 24)
+      designers = products.map(&:designer).uniq
+
+      assert_equal 4, designers.length
+      assert_includes designers, "oni-denim"
+      assert_includes designers, "iron-heart"
+      assert_includes designers, "samurai-jeans"
+      assert_includes designers, "studio-dartisan"
     end
 
     test "fallback pagination supports multiple pages with 20 items" do
@@ -117,6 +140,24 @@ module Shopify
 
       assert page.products.any?
       assert page.products.all? { |product| product.category == "jackets" }
+    end
+
+    test "fallback page filters by supported designer" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      page = catalog.page(first: 24, designer: "oni-denim")
+
+      assert page.products.any?
+      assert page.products.all? { |product| product.designer == "oni-denim" }
+    end
+
+    test "fallback page supports combined designer and category filters" do
+      catalog = ProductCatalog.new(client: OfflineClient.new)
+
+      page = catalog.page(first: 24, designer: "studio-dartisan", category: "jackets")
+
+      assert page.products.any?
+      assert page.products.all? { |product| product.designer == "studio-dartisan" && product.category == "jackets" }
     end
   end
 end

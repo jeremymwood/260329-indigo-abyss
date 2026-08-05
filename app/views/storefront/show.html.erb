@@ -1,15 +1,30 @@
 <% content_for :title, "#{@product.title} | Indigo Abyss" %>
+<% gallery_images = @product.image_urls.first(3) %>
+<% while gallery_images.length < 3 %>
+  <% gallery_images << @product.primary_image_url %>
+<% end %>
 
 <main class="site-shell">
-  <nav class="product-breadcrumb">
-    <%= link_to "Back to Collection", root_path %>
-    <span class="breadcrumb-spacer">|</span>
-    <%= link_to "Cart", cart_path %>
-  </nav>
-
   <article class="product-detail">
     <div class="product-detail-image-wrap">
-      <img src="<%= @product.image_url %>" alt="<%= @product.title %>" class="product-detail-image">
+      <div class="product-gallery-carousel" data-interval="5000" aria-label="<%= @product.title %> image gallery">
+        <% gallery_images.each_with_index do |image_url, idx| %>
+          <div class="hero-slide <%= "is-active" if idx.zero? %>">
+            <img src="<%= image_url %>" alt="<%= "#{@product.title} photo #{idx + 1}" %>" class="product-detail-image" loading="lazy">
+          </div>
+        <% end %>
+
+        <% if gallery_images.length > 1 %>
+          <div class="product-gallery-controls" aria-label="Product image controls">
+            <button type="button" class="hero-carousel-prev" aria-label="Previous image">
+              <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="hero-carousel-next" aria-label="Next image">
+              <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="product-detail-content">

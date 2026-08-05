@@ -1,16 +1,43 @@
 <% content_for :title, "Indigo Abyss | Raw Denim" %>
 
 <main class="site-shell">
-  <section class="hero">
-    <p class="eyebrow">Shopify x Rails Storefront</p>
-    <h1>Indigo Abyss</h1>
-    <p class="lead">Purpose-built denim for deep fades, hard wear, and long ownership.</p>
-    <p class="sublead">
-      <%= @shopify_connected ? "Live product data is loading from your Shopify storefront." : "Running in showcase mode. Set Shopify env vars to pull live products." %>
-    </p>
-    <p class="hero-actions">
-      <%= link_to "Browse Full Collection", shop_path, class: "pagination-link" %>
-    </p>
+  <section class="collection-hero collection-hero-carousel" aria-label="Collection overview">
+    <h1 class="sr-only">Indigo Abyss</h1>
+    <% if @products.present? %>
+      <div class="hero-carousel" data-interval="5000" aria-label="Featured carousel">
+        <% @products.each_with_index do |product, index| %>
+          <article class="hero-slide <%= "is-active" if index.zero? %>">
+            <%= link_to product_path(product.handle || product.id), class: "hero-slide-link", aria: { label: "View #{product.title}" } do %>
+              <% hero_images = product.image_urls.first(3) %>
+              <% while hero_images.length < 3 %>
+                <% hero_images << product.primary_image_url %>
+              <% end %>
+              <div class="hero-slide-strip" aria-hidden="true">
+                <% hero_images.each_with_index do |image_url, image_index| %>
+                  <img src="<%= image_url %>" alt="<%= "#{product.title} photo #{image_index + 1}" %>" loading="lazy">
+                <% end %>
+              </div>
+              <div class="hero-slide-overlay">
+                <p class="hero-slide-designer"><%= product_designer_label(product) %></p>
+                <p class="hero-slide-title"><%= product.title %></p>
+                <p class="hero-slide-subtitle">Available Now</p>
+              </div>
+            <% end %>
+          </article>
+        <% end %>
+
+        <div class="hero-carousel-controls" aria-label="Carousel controls">
+          <button type="button" class="hero-carousel-prev" aria-label="Previous slide">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="hero-carousel-next" aria-label="Next slide">
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    <% else %>
+      <p class="lead">Purpose-built denim for deep fades, hard wear, and long ownership.</p>
+    <% end %>
   </section>
 
   <section class="collection-header">
@@ -21,11 +48,16 @@
     <% @products.each do |product| %>
       <%= link_to product_path(product.handle || product.id), class: "product-card-link", aria: { label: "View #{product.title}" } do %>
         <article class="product-card">
-          <img src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+          <div class="product-media">
+            <img class="product-image product-image-primary" src="<%= product.image_url %>" alt="<%= product.title %>" loading="lazy">
+            <img class="product-image product-image-secondary" src="<%= product.secondary_image_url %>" alt="" aria-hidden="true" loading="lazy">
+          </div>
           <div class="product-body">
             <h3><%= product.title %></h3>
-            <p><%= product.description %></p>
-            <span class="price"><%= product.price %></span>
+            <p class="product-designer"><%= product_designer_label(product) %></p>
+            <p class="product-description"><%= product.description %></p>
+            <p class="product-category">Style: <%= product_style_label(product) %></p>
+            <p class="price"><%= product_card_price(product) %></p>
           </div>
         </article>
       <% end %>

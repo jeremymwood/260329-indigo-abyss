@@ -14,6 +14,7 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
@@ -21,20 +22,430 @@
   <body>
     <nav class="site-nav" aria-label="Primary">
       <div class="site-nav-inner">
-        <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
-        <div class="site-nav-links">
-          <%= link_to "Home", root_path, class: nav_link_class(:home) %>
-          <%= link_to "Shop", shop_path, class: nav_link_class(:shop) %>
-          <%= link_to cart_nav_label, cart_path, class: nav_link_class(:cart) %>
+        <div class="site-nav-top">
+          <button type="button" class="site-nav-hamburger" aria-expanded="false" aria-label="Toggle navigation menu">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            <span class="sr-only">Toggle menu</span>
+          </button>
+          <%= link_to "Indigo Abyss", root_path, class: "site-brand" %>
+<div class="site-nav-menu">
+  <div class="site-nav-primary">
+    <form class="site-nav-search site-search-inline" action="<%= shop_path %>" method="get" role="search">
+  <label for="drawer-search" class="sr-only">Search products</label>
+  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+  <input id="drawer-search" name="q" type="search" placeholder="Search">
+</form>
+
+    <%= link_to "New Arrivals", shop_path(view: "new-arrivals"), class: "site-nav-link nav-hover-cyan" %>
+
+    <div class="site-nav-dropdown">
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Designers" aria-expanded="false"><span>Designers</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+      <div class="site-nav-panel">
+        <%= link_to "Oni Denim", designer_collection_path("oni-denim") %>
+        <%= link_to "Iron Heart", designer_collection_path("iron-heart") %>
+        <%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %>
+        <%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %>
+      </div>
+    </div>
+
+    <div class="site-nav-dropdown">
+      <button type="button" class="site-nav-dropdown-toggle nav-hover-cyan drawer-parent-link" data-drawer-label="Categories" aria-expanded="false"><span>Categories</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+      <div class="site-nav-panel">
+        <%= link_to "Pants", category_collection_path("pants") %>
+        <%= link_to "Shirts", category_collection_path("shirts") %>
+        <%= link_to "Jackets", category_collection_path("jackets") %>
+        <%= link_to "Accessories", category_collection_path("accessories") %>
+      </div>
+    </div>
+
+    <%= link_to "Sale", shop_path, class: "site-nav-link sale-link" %>
+    <hr class="site-nav-login-divider" aria-hidden="true">
+    <%= link_to root_path, class: "site-nav-login-button" do %>
+      <i class="fa-regular fa-user" aria-hidden="true"></i>
+      <span>Login</span>
+    <% end %>
+  </div>
+
+  <div class="site-nav-subpanel" aria-hidden="true">
+    <div class="site-nav-subpanel-header">
+      <button type="button" class="site-nav-subpanel-back" aria-label="Back to main menu">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <h2 class="site-nav-subpanel-title"></h2>
+    </div>
+    <div class="site-nav-subpanel-links"></div>
+  </div>
+</div>
+
+
+          <div class="site-nav-utilities" aria-label="Utility links">
+            <%= link_to shop_path, class: "#{utility_link_class(:shop)} icon-link site-header-search-trigger", aria: { label: "Search", controls: "site-header-search-panel", expanded: "false" }, title: "Search", data: { header_search_toggle: "true" } do %>
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <span class="sr-only">Search</span>
+            <% end %>
+
+            <%= link_to root_path, class: "#{utility_link_class} icon-link", aria: { label: "Account" }, title: "Account" do %>
+              <i class="fa-regular fa-user" aria-hidden="true"></i>
+              <span class="sr-only">Account</span>
+            <% end %>
+
+            <%= link_to cart_path, class: "#{utility_link_class(:cart)} icon-link cart-icon-link", aria: { label: cart_nav_label }, title: cart_nav_label do %>
+              <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+              <span class="cart-count-badge"><%= cart_count %></span>
+              <span class="sr-only"><%= cart_nav_label %></span>
+            <% end %>
+          </div>
         </div>
       </div>
     </nav>
+
+<section id="site-header-search-panel" class="site-header-search" aria-label="Header search" hidden>
+  <form class="site-header-search-form site-search-inline" action="<%= shop_path %>" method="get" role="search">
+    <label for="header-search" class="sr-only">Search products</label>
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input id="header-search" name="q" type="search" placeholder="Search">
+  </form>
+</section>
+<div class="site-header-search-overlay" hidden></div>
+
 
     <% flash.each do |type, message| %>
       <% next if message.blank? %>
       <p class="flash <%= type %>"><%= message %></p>
     <% end %>
     <%= yield %>
-  </body>
+    <footer class="site-footer" aria-label="Footer">
+      <div class="site-footer-inner">
+        <div class="footer-grid">
+          <section>
+            <h3>Shop</h3>
+            <ul>
+              <li><%= link_to "New Arrivals", shop_path(view: "new-arrivals") %></li>
+              <li><%= link_to "Pants", category_collection_path("pants") %></li>
+              <li><%= link_to "Shirts", category_collection_path("shirts") %></li>
+              <li><%= link_to "Jackets", category_collection_path("jackets") %></li>
+              <li><%= link_to "Accessories", category_collection_path("accessories") %></li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Designers</h3>
+            <ul>
+              <li><%= link_to "Oni Denim", designer_collection_path("oni-denim") %></li>
+              <li><%= link_to "Iron Heart", designer_collection_path("iron-heart") %></li>
+              <li><%= link_to "Samurai Jeans", designer_collection_path("samurai-jeans") %></li>
+              <li><%= link_to "Studio D'Artisan", designer_collection_path("studio-dartisan") %></li>
+            </ul>
+          </section>
+
+          <section>
+            <h3>Support</h3>
+            <ul>
+              <li><a href="#">Shipping</a></li>
+              <li><a href="#">Returns</a></li>
+              <li><a href="#">Sizing Help</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </section>
+
+          <section class="footer-signup" aria-label="Newsletter signup">
+            <h3>Newsletter</h3>
+            <p>Get drop alerts for new denim releases and restocks.</p>
+            <form class="footer-signup-form" action="#" method="get">
+              <label for="footer-email" class="sr-only">Email address</label>
+              <input id="footer-email" type="email" name="email" placeholder="Email address">
+              <button type="submit">Subscribe</button>
+            </form>
+          </section>
+        </div>
+
+        <div class="footer-base">
+          <p>&copy; <%= Time.current.year %> Indigo Abyss. All rights reserved.</p>
+          <div class="footer-icons" aria-label="Social and payment">
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+            <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-visa" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-mastercard" aria-hidden="true"></i>
+            <i class="fa-brands fa-cc-paypal" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+    </footer>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var siteNav = document.querySelector(".site-nav");
+    var navTop = document.querySelector(".site-nav-top");
+    var navHamburger = document.querySelector(".site-nav-hamburger");
+    var navIcon = navHamburger ? navHamburger.querySelector("i") : null;
+    var subpanel = navTop ? navTop.querySelector(".site-nav-subpanel") : null;
+    var subpanelTitle = navTop ? navTop.querySelector(".site-nav-subpanel-title") : null;
+    var subpanelLinks = navTop ? navTop.querySelector(".site-nav-subpanel-links") : null;
+    var subpanelBack = navTop ? navTop.querySelector(".site-nav-subpanel-back") : null;
+
+    var isMobileDrawer = function () {
+      return window.innerWidth <= 1120;
+    };
+
+    var measureScrollbarComp = function () {
+      var width = window.innerWidth - document.documentElement.clientWidth;
+      return width > 0 ? width : 0;
+    };
+
+    var applyScrollbarComp = function (width) {
+      document.documentElement.style.setProperty("--scrollbar-comp", width + "px");
+    };
+
+    var clearScrollbarComp = function () {
+      document.documentElement.style.removeProperty("--scrollbar-comp");
+    };
+
+    var resetSubpanel = function () {
+      if (!navTop || !subpanel) return;
+
+      navTop.classList.remove("subpanel-open");
+      subpanel.setAttribute("aria-hidden", "true");
+      if (subpanelTitle) subpanelTitle.textContent = "";
+      if (subpanelLinks) subpanelLinks.innerHTML = "";
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    };
+
+var headerSearch = document.querySelector(".site-header-search");
+var headerSearchInput = headerSearch ? headerSearch.querySelector("input") : null;
+var headerSearchOverlay = document.querySelector(".site-header-search-overlay");
+var headerSearchToggles = Array.from(document.querySelectorAll("[data-header-search-toggle='true']"));
+
+var syncHeaderSearchOffset = function () {
+  if (!siteNav) return;
+  var navHeight = siteNav.offsetHeight || 0;
+  document.documentElement.style.setProperty("--site-nav-height", navHeight + "px");
+};
+
+syncHeaderSearchOffset();
+
+var setHeaderSearchState = function (isOpen) {
+  syncHeaderSearchOffset();
+  if (!headerSearch) return;
+
+  headerSearch.classList.toggle("is-open", isOpen);
+  headerSearch.hidden = !isOpen;
+  if (headerSearchOverlay) headerSearchOverlay.hidden = !isOpen;
+  document.body.classList.toggle("header-search-open", isOpen);
+  headerSearchToggles.forEach(function (toggle) {
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  if (isOpen && headerSearchInput) {
+    setTimeout(function () { headerSearchInput.focus(); }, 0);
+  }
+};
+
+headerSearchToggles.forEach(function (toggle) {
+  toggle.addEventListener("click", function (event) {
+    event.preventDefault();
+    setHeaderSearchState(!headerSearch.classList.contains("is-open"));
+  });
+});
+
+    var setNavState = function (isOpen) {
+      if (!navTop || !navHamburger) return;
+
+      if (isOpen) {
+        applyScrollbarComp(measureScrollbarComp());
+        setHeaderSearchState(false);
+      }
+
+      navTop.classList.toggle("nav-menu-open", isOpen);
+      document.body.classList.toggle("nav-drawer-open", isOpen);
+      navHamburger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      navHamburger.classList.toggle("is-open", isOpen);
+
+      if (navIcon) {
+        navIcon.classList.toggle("fa-bars", !isOpen);
+        navIcon.classList.toggle("fa-xmark", isOpen);
+      }
+
+      if (!isOpen) {
+        resetSubpanel();
+        clearScrollbarComp();
+      }
+    };
+
+    var openSubpanel = function (toggle) {
+      if (!isMobileDrawer() || !subpanel || !subpanelLinks || !subpanelTitle) return;
+
+      var dropdown = toggle.closest(".site-nav-dropdown");
+      var links = dropdown ? Array.from(dropdown.querySelectorAll(".site-nav-panel a")) : [];
+      if (links.length === 0) return;
+
+      subpanelTitle.textContent = toggle.dataset.drawerLabel || toggle.textContent.trim();
+      subpanelLinks.innerHTML = "";
+
+      links.forEach(function (link) {
+        var clone = link.cloneNode(true);
+        clone.addEventListener("click", function () {
+          setNavState(false);
+        });
+        subpanelLinks.appendChild(clone);
+      });
+
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (btn) {
+        btn.setAttribute("aria-expanded", btn === toggle ? "true" : "false");
+      });
+
+      navTop.classList.add("subpanel-open");
+      subpanel.setAttribute("aria-hidden", "false");
+    };
+
+    if (navTop && navHamburger) {
+      navHamburger.addEventListener("click", function () {
+        setNavState(!navTop.classList.contains("nav-menu-open"));
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!navTop.contains(event.target)) setNavState(false);
+
+        var clickedSearchToggle = headerSearchToggles.some(function (toggle) {
+          return toggle.contains(event.target);
+        });
+        if (headerSearch && !headerSearch.contains(event.target) && !clickedSearchToggle) {
+          setHeaderSearchState(false);
+        }
+      });
+
+      navTop.querySelectorAll(".site-nav-link, .site-nav-login-button").forEach(function (link) {
+        link.addEventListener("click", function () {
+          setNavState(false);
+        });
+      });
+
+      navTop.querySelectorAll(".drawer-parent-link").forEach(function (toggle) {
+        toggle.addEventListener("click", function (event) {
+          if (!isMobileDrawer()) return;
+
+          event.preventDefault();
+          openSubpanel(toggle);
+        });
+      });
+
+      if (subpanelBack) {
+        subpanelBack.addEventListener("click", function () {
+          resetSubpanel();
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          if (navTop.classList.contains("subpanel-open")) {
+            resetSubpanel();
+          } else {
+            setNavState(false);
+            setHeaderSearchState(false);
+          }
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        syncHeaderSearchOffset();
+        if (window.innerWidth > 1120) setNavState(false);
+      });
+    }
+
+document.querySelectorAll(".hero-carousel, .product-gallery-carousel").forEach(function (carousel) {
+  var slides = Array.from(carousel.querySelectorAll(".hero-slide"));
+  if (slides.length === 0) return;
+
+  var prev = carousel.querySelector(".hero-carousel-prev");
+  var next = carousel.querySelector(".hero-carousel-next");
+  var current = slides.findIndex(function (slide) { return slide.classList.contains("is-active"); });
+  if (current < 0) current = 0;
+  var intervalMs = parseInt(carousel.dataset.interval || "5000", 10);
+  var timer;
+
+  var render = function () {
+    slides.forEach(function (slide, idx) {
+      slide.classList.toggle("is-active", idx === current);
+    });
+  };
+
+  var go = function (idx) {
+    current = (idx + slides.length) % slides.length;
+    render();
+  };
+
+  var start = function () {
+    if (slides.length <= 1) return;
+    clearInterval(timer);
+    timer = setInterval(function () { go(current + 1); }, intervalMs);
+  };
+
+  if (prev) {
+    prev.addEventListener("click", function () {
+      go(current - 1);
+      start();
+    });
+  }
+
+  if (next) {
+    next.addEventListener("click", function () {
+      go(current + 1);
+      start();
+    });
+  }
+
+  carousel.addEventListener("mouseenter", function () { clearInterval(timer); });
+  carousel.addEventListener("mouseleave", start);
+  render();
+  start();
+});
+
+    document.querySelectorAll(".facet-pills-form").forEach(function (form) {
+      var pills = Array.from(form.querySelectorAll("details.facet-pill"));
+      if (pills.length === 0) return;
+
+      var closeAll = function (exceptPill) {
+        pills.forEach(function (pill) {
+          if (pill !== exceptPill) pill.open = false;
+        });
+      };
+
+      pills.forEach(function (pill) {
+        pill.addEventListener("toggle", function () {
+          if (pill.open) closeAll(pill);
+        });
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!form.contains(event.target)) closeAll(null);
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeAll(null);
+      });
+
+      form.querySelectorAll("select, input[type='checkbox'], input[type='number']").forEach(function (control) {
+        control.addEventListener("change", function () {
+          closeAll(null);
+        });
+      });
+    });
+  });
+</script>
+
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
