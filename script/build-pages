@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+site_dir="${1:-_site}"
+port="${PORT:-3000}"
+origin="http://127.0.0.1:${port}"
+
+rm -rf -- "$site_dir"
+mkdir -p "$site_dir"
+
+bin/rails db:prepare
+RAILS_SERVE_STATIC_FILES=1 bin/rails server --environment production --binding 127.0.0.1 --port "$port" --daemon
+
+cleanup() {
+  if [[ -f tmp/pids/server.pid ]]; then
+    kill "$(cat tmp/pids/server.pid)" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+for attempt in {1..30}; do
+  if curl --fail --silent --output /dev/null "$origin/up"; then
+    break
+  fi
+
+  if [[ "$attempt" == 30 ]]; then
+    echo "Rails did not start in time" >&2
+    exit 1
+  fi
+  sleep 1
+done
+
+# Crawl every linked storefront page and rewrite links for static hosting. Relative
+# links produced by wget also make the snapshot work beneath a repository Pages URL.
+wget \
+  --recursive \
+  --level=inf \
+  --page-requisites \
+  --convert-links \
+  --adjust-extension \
+  --no-host-directories \
+  --domains 127.0.0.1 \
+  --directory-prefix "$site_dir" \
+  --reject-regex '/up($|[?/])' \
+  "$origin/"
+
+touch "$site_dir/.nojekyll"
+
+test -f "$site_dir/index.html"
+test -f "$site_dir/shop.html"
+test -n "$(find "$site_dir/products" -name '*.html' -print -quit)"

@@ -64,6 +64,22 @@ Then every `git push` runs:
 
 Full workflow + troubleshooting: [Developer Runbook](docs/developer-runbook.md)
 
+## GitHub Pages
+
+The `pages.yml` workflow publishes a static showcase snapshot whenever `main` is
+updated. It includes the homepage, catalog, categories, designers, product pages,
+styles, and images. You can also run it manually from **Actions → Deploy static
+storefront to GitHub Pages**.
+
+In the repository's **Settings → Pages**, set **Source** to **GitHub Actions**.
+The site will be available at
+`https://jeremymwood.github.io/260329-indigo-abyss/` after the first successful
+deployment.
+
+GitHub Pages cannot run Rails. The published snapshot therefore uses the fallback
+catalog generated at build time; session-backed cart mutations, checkout, and live
+Shopify requests still require the Rails application to be hosted on a server.
+
 ## Environment Variable Safety
 
 - Do not commit `.env` or token files.

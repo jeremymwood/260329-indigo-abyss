@@ -49,6 +49,7 @@
 !/tmp/storage/.keep
 
 /public/assets
+/_site
 
 # Secret scanning reports
 /gitleaks-report.json
