@@ -9,6 +9,7 @@ rm -rf -- "$site_dir"
 mkdir -p "$site_dir"
 
 bin/rails db:prepare
+bin/rails assets:precompile
 RAILS_SERVE_STATIC_FILES=1 bin/rails server --environment production --binding 127.0.0.1 --port "$port" --daemon
 
 cleanup() {
